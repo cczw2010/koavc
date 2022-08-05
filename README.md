@@ -94,11 +94,7 @@ alias: {
 
 ### 中间件
   
-  中间件为koa的中间件，可以在配置文件中配置全局加载，也可以在`路由文件`中自定义加载。 中间件支持两种`本地中间件`和`第三方中间件`。
-
-*** 配置
-
-在`koavc.config.js`中的 middlewares选项中可以配置全局加载的中间件列表，在`路由文件`中配置的中间件只在当前路由中生效，配置格式，格式如下：
+  中间件为koa的中间件，可以在配置文件中配置全局加载，也可以在`路由文件`中自定义加载。 中间件支持两种`本地中间件`和`第三方中间件`。 在`koavc.config.js`中的 middlewares选项中可以配置全局加载的中间件列表，在`路由文件`中配置的中间件只在当前路由中生效，配置格式，格式如下：
 
 ```
 import etag from "koa-etag"
@@ -133,9 +129,10 @@ ctx.view(viewpath,data)
   * **`default`** 无引擎，
   * **`lodash`**  基于lodash.Template的极简模板引擎
  
-  	```
-     <% [js code] %> ,<%=[js variables]%>
-   ```
+  ```
+  <% [js code] %> ,<%=[js variables]%>
+  
+  ```
 
   * **`vue`**  基于vue2的ssr单文件（SFC）渲染引擎，封装了[vuesfcbuiler](https://github.com/cczw2010/vuesfcbuilder)库来使用服务器端渲染，借鉴了一些`nuxt`,支持布局文件和页面文件以及组件.[参考](https://www.w3cschool.cn/vuessr/)。 详细说明和配置可查看`vuesfcbuilder`项目说明 ，或者`koavc`包根目录下的[默认配置文件](./vuesfcbuilder.config.js),
 
@@ -192,5 +189,6 @@ ctx.alias.list()
 
 
 
+### DEMO
 
-
+查看[这里](https://github.com/cczw2010/koavc-example)
