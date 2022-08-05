@@ -1,10 +1,11 @@
 {
   "name": "koavc",
   "version": "1.0.0",
-  "description": "A node mvc framework with vue ssr supported",
+  "description": "A mvc framework based koa, support multi view rendering engine ,like  vue ssr, lodash",
   "main": "index.js",
   "type": "module",
   "author": "awen",
+  "repository": "github:cczw2010/koavc",
   "license": "ISC",
   "scripts": {},
   "bin": {
