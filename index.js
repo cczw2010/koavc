@@ -9,18 +9,18 @@ import defConfig from './koavc.config.js'
 // 启动生产web服务
 export async function run(Config){
   const app = await initialize(Config)
-  const httpOptions = Config.https
-  const server = httpOptions?https:http
+  const httpsOption = Config.https
+  const server = httpsOption?https:http
   const port = Config.port
   const cb  = (err)=>{
     if (err) {
       app.context.logger.error(err)
     } else {
-      app.context.logger.success('[server]',`${httpOptions?'https':'http'} server start success. listenn at ${port}`);
+      app.context.logger.success('[server]',`${httpsOption?'https':'http'} server start success. listenn at ${port}`);
     } 
   }
-  if(httpOptions){
-    server.createServer(httpOptions,app.callback()).listen(port, cb);
+  if(httpsOption){
+    server.createServer(httpsOption,app.callback()).listen(port, cb);
   }else{
     server.createServer(app.callback()).listen(port, cb);
   }
