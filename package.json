@@ -1,0 +1,26 @@
+{
+  "name": "koavc",
+  "version": "1.0.0",
+  "description": "A node mvc framework with vue ssr supported",
+  "main": "index.js",
+  "type": "module",
+  "author": "awen",
+  "license": "ISC",
+  "scripts": {},
+  "bin": {
+    "koavc": "./bin/index.js"
+  },
+  "dependencies": {
+    "@koa/router": "^12.0.0",
+    "consola": "^2.15.3",
+    "dayjs": "^1.11.4",
+    "deepmerge": "^4.2.2",
+    "koa": "^2.13.4",
+    "lodash.template": "^4.5.0",
+    "vuesfcbuilder": "^1.1.0",
+    "write": "^2.0.0"
+  },
+  "imports": {
+    "#root/*": "./*"
+  }
+}
