@@ -4,6 +4,7 @@ import {createLogger} from '../libs/logger.js'
 import controller from './controller.js'
 import view from './view/index.js'
 import middlewareLoader from "./middleware.js"
+import alias from '../middlewares/alias.js'
 // const serverRoot = dirname(dirname(fileURLToPath(import.meta.url)))
 
 export async function initialize(Config){
@@ -14,6 +15,8 @@ export async function initialize(Config){
   })
   app.context.Config = Config
   app.context.logger =logger
+  // 加载alias中间件
+  app.use(await alias(Config.alias,logger))
   // 动态加载所有的配置middleware
   await middlewareLoader(Config.middlewares,app)
 

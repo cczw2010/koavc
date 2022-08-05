@@ -69,15 +69,28 @@ router:{
     // prefix:'',
     //不建议修改，否则路由规则可能会超出预想。因为路由模块获取文件list路由的时候 带_的泛路由文件名会在最前面，所以，执行最后一个正好不会覆盖实名路由
     exclusive:true,
-  },
-  <!-- 全局的路由别名配置单 -->
-  alias:{
-    '/aboutus':'/article/100',
-    ...
   }
 },
 ...
 ```
+
+### alias别名
+
+为了支持seo,内置实现了个简单的 `alias`中间件最为路由映射使用，也提供了api可以动态更新路由映射，具体参考API部分
+
+*** 配置
+
+```
+alias: {
+ //初始化获取alias列表对象的方法，格式{aliasPath:directTo},不提供的话为空,
+ get:asyncFunction
+ //本地化保存alias的方法，不提供的存在缓存               
+ set:asyncFunction(aliasPath,directTo)   
+ //本地化删除alias的方法，不提供的存在缓存
+ del:asyncFunction(aliasPath)
+}
+```
+
 
 ### 中间件
   
@@ -151,6 +164,7 @@ api都注入到了`context`上
 
 #### context.Config
 配置信息
+
 #### context.logger
 同过consola实现的logger日志方法,可通过配置文件的logger选项设置，支持console和file两种日志方式，默认配置如下：
 
@@ -163,7 +177,16 @@ api都注入到了`context`上
         dir:'logs',       // 日志目录
       }
     }
-  
+
+#### context.alias
+路由别名映射对象,路径都是相对于根目录
+
+ctx.alias.set(aliasPath,redirectTo)
+
+ctx.alias.del(aliasPath)
+
+ctx.alias.list()
+
 #### context.view(tplPath,data)
 根据配置的渲染引擎，加载渲染模板
 
