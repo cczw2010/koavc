@@ -74,19 +74,19 @@ router:{
 ...
 ```
 
-### alias别名
+### alias中间件
 
-为了支持seo,内置实现了个简单的 `alias`中间件最为路由映射使用，也提供了api可以动态更新路由映射，具体参考API部分
+为了支持seo,内置实现了个简单的 `alias`中间件最为路由映射使用，如果想加载只需增加响应配置即可，也提供了api可以动态更新路由映射，具体参考API部分
 
 *** 配置
 
 ```
 alias: {
- //初始化获取alias列表对象的方法，格式{aliasPath:directTo},不提供的话为空,
+ //可选，初始化获取alias列表对象的方法，格式{aliasPath:directTo},不提供的话为空,
  get:asyncFunction
- //本地化保存alias的方法，不提供的存在缓存               
+ //可选，本地化保存alias的方法，不提供的存在缓存               
  set:asyncFunction(aliasPath,directTo)   
- //本地化删除alias的方法，不提供的存在缓存
+ //可选，本地化删除alias的方法，不提供的存在缓存
  del:asyncFunction(aliasPath)
 }
 ```

@@ -24,6 +24,8 @@ export async function run(Config){
   }else{
     server.createServer(app.callback()).listen(port, cb);
   }
+  app.context.logger.info("memory：",JSON.stringify(process.memoryUsage()))
+  app.context.logger.info("cpu：",JSON.stringify(process.cpuUsage()))
 }
 
 // 初始化参数设置

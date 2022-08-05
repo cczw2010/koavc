@@ -11,7 +11,7 @@ const projectRoot = process.env.PWD
 export default async function(options,app){
   options = options||[]
   let cnt = 0
-  app.context.logger.info("loading middlewares...")
+  app.context.logger.info("loading user middlewares...")
   for (const key in options) {
     const item = options[key]
     let middlewarePath= item

@@ -16,7 +16,10 @@ export async function initialize(Config){
   app.context.Config = Config
   app.context.logger =logger
   // 加载alias中间件
-  app.use(await alias(Config.alias,logger))
+  if(Config.alias){
+    logger.info("load alias middleware")
+    app.use(await alias(Config.alias,logger))
+  }
   // 动态加载所有的配置middleware
   await middlewareLoader(Config.middlewares,app)
 
