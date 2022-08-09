@@ -43,3 +43,7 @@ export async function initConfig(){
   }
   return deepmerge(defConfig,localConfig)
 }
+
+export async function initVueConfig(){
+
+}

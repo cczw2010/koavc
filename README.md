@@ -187,8 +187,6 @@ ctx.alias.list()
 #### context.view(tplPath,data)
 根据配置的渲染引擎，加载渲染模板
 
-
-
 ### DEMO
 
 查看[这里](https://github.com/cczw2010/koavc-example)

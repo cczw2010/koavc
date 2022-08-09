@@ -1,6 +1,6 @@
 // 模板文件请使用单文件模式
 // 注意，该模式应该区分服务器端渲染，可服务器端注入（只预注入数据和处理中间件，而不进行直接vue渲染），暂时定位为后
-import  renderer from "vuesfcbuilder/render"
+import  {renderer} from "vuesfcbuilder"
 
 // console.log(clientManifest)
 //TODO lru-cache  缓存

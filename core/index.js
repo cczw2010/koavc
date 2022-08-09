@@ -5,6 +5,8 @@ import controller from './controller.js'
 import view from './view/index.js'
 import middlewareLoader from "./middleware.js"
 import alias from '../middlewares/alias.js'
+import staticServe from "koa-static"
+import mount from "koa-mount"
 // const serverRoot = dirname(dirname(fileURLToPath(import.meta.url)))
 
 export async function initialize(Config){
@@ -34,12 +36,11 @@ export async function initialize(Config){
   app.use(router)
 
   // 初始化静态服务
-  // if(Config.static){
-  //   const statics = Config.static
-  //   for(const routName in statics){
-  //     app.use(mount(routName,staticServe(statics[routName])))
-  //   }
-  // }
+  if(Config.statics){
+    for(const staticInfo of Config.statics){
+      app.use(mount(staticInfo[0],staticServe(staticInfo[1])),{defer:true})
+    }
+  }
 
   return app
 }

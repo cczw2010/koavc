@@ -1,4 +1,4 @@
-import vueBuildConfig from './vuesfcbuilder.config.js'
+import { rootDist } from "vuesfcbuilder"
 
 export default {
   //============ 服务器配置
@@ -37,9 +37,20 @@ export default {
     src:'view',      //相对于根目录
     engine:'default'    //渲染引擎 default | lodash | vue 可自行拓展
   },
-  middlewares:{
-
-  },
-  ///============vuesfcbuilder
-  vuesfcbuilder:vueBuildConfig
+  middlewares:{},
+  // 设置静态目录服务
+  statics:[
+    ['/static',rootDist],   //vue输出目录挂载到`/static`路由上
+  ],
+  //============vuesfcbuilder
+  vuesfcbuilder: {
+    injectStyle:'/static', 
+    injectScript:'/static',
+    buildModules:{
+      // vuetify:{
+      //   // meta:{},
+      //   option:{}
+      // }
+    }
+  }
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 "use strict"
 import consola from "consola"
-import compiler from "vuesfcbuilder"
+import {compiler} from "vuesfcbuilder"
 import {run,initConfig} from "../index.js"
 const Config = await initConfig()
 switch (process.argv[2]) {
