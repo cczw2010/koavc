@@ -150,7 +150,11 @@ view:{
 <!-- vue时有效，参数为vuesfcrender库的配置 -->
 vuesfcbuilder:{
   /*vuesfcrender的配置*/
-}
+},
+<!-- 静态路由目录，可配置多个 -->
+statics:[
+  ['/static',/**vuerootDist**/],   //默认，vue输出目录挂载到`/static`路由上
+]
     
 ```
  
