@@ -23,7 +23,7 @@ export default {
   // alias:{},
   //============日志
   logger:{
-    tag:"koavc",   // tag标签
+    tag:"koavc",      // tag标签
     level:4,          // consola的level
     console:true,     // 开启不开启
     file:{            // false  不开启

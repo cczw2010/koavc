@@ -1,6 +1,6 @@
 {
   "name": "koavc",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A mvc framework based koa, support multi view rendering engine ,like  vue ssr, lodash",
   "main": "index.js",
   "type": "module",
@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@koa/router": "^12.0.0",
+    "chalk": "^5.0.1",
     "consola": "^2.15.3",
     "dayjs": "^1.11.4",
     "deepmerge": "^4.2.2",

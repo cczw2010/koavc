@@ -5,6 +5,7 @@ import deepmerge from "deepmerge"
 import consola from "consola"
 import {initialize} from "./core/index.js"
 import defConfig from './koavc.config.js'
+import chalk from "chalk"
 
 // 启动生产web服务
 export async function run(Config){
@@ -16,7 +17,11 @@ export async function run(Config){
     if (err) {
       app.context.logger.error(err)
     } else {
-      app.context.logger.success('[server]',`${httpsOption?'https':'http'} server start success. listenn at ${port}`);
+      app.context.logger.success('[server]',`${httpsOption?'https':'http'} server start success. listenn at ${port}.`);
+      const muse = process.memoryUsage()
+      const mstr = `{"rss":${muse.rss},"heapUsed":${muse.heapUsed}}`
+      app.context.logger.info("memory:",chalk.grey(mstr))
+      app.context.logger.info("cpu:\t",chalk.grey(JSON.stringify(process.cpuUsage())))
     } 
   }
   if(httpsOption){
@@ -24,10 +29,8 @@ export async function run(Config){
   }else{
     server.createServer(app.callback()).listen(port, cb);
   }
-  app.context.logger.info("memory：",JSON.stringify(process.memoryUsage()))
-  app.context.logger.info("cpu：",JSON.stringify(process.cpuUsage()))
-}
 
+}
 // 初始化参数设置
 export async function initConfig(){
   consola.info('loading config')
