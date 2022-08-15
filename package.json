@@ -26,5 +26,9 @@
   },
   "imports": {
     "#root/*": "./*"
+  },
+  "devDependencies": {
+    "chokidar": "^3.5.3",
+    "ws": "^8.8.1"
   }
 }

@@ -8,8 +8,8 @@ import defConfig from './koavc.config.js'
 import chalk from "chalk"
 
 // 启动生产web服务
-export async function run(Config){
-  const app = await initialize(Config)
+export async function run(Config,isDev=false){
+  const app = await initialize(Config,isDev)
   const httpsOption = Config.https
   const server = httpsOption?https:http
   const port = Config.port

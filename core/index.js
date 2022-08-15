@@ -9,7 +9,7 @@ import staticServe from "koa-static"
 import mount from "koa-mount"
 // const serverRoot = dirname(dirname(fileURLToPath(import.meta.url)))
 
-export async function initialize(Config){
+export async function initialize(Config,isDev){
   const app = new Koa()
   const logger =  createLogger(Config.logger)
   app.on('error', (err, ctx) => {
@@ -28,7 +28,7 @@ export async function initialize(Config){
   // 初始化model
   // app.use(model(join(app.context.Config.root,'model')))
   // 初始化view
-  const viewer = await view(Config.view)
+  const viewer = await view(Config.view,isDev)
   app.use(viewer)
   // 初始化controller
   Config.router.dir = join(Config.root,Config.router.dir)

@@ -5,7 +5,6 @@ import chalk from "chalk"
 import {join} from "path"
 import {compiler,rootDist} from "vuesfcbuilder"
 import {run,initConfig} from "../index.js"
-import { createLogger } from "../libs/logger.js"
 const Config = await initConfig()
 switch (process.argv[2]) {
   case "build":
@@ -35,11 +34,10 @@ switch (process.argv[2]) {
       consola.info(`vue complier with [${chalk.yellow('development')}] mode ♻️`)
       Config.vuesfcbuilder.isDev = true
       compiler(true,Config.vuesfcbuilder,()=>{
-        run(Config)
+        run(Config,true)
       })
     }else{
-      //TODO 监控各引擎对应的落地页面变化  ,liveload
-      run(Config)
+      run(Config,true)
     }
     break;
   default:

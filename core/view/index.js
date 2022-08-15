@@ -1,7 +1,7 @@
 import {join} from "path"
 import {readFile} from "fs/promises"
 
-export default async (options)=>{
+export default async (options,isDev)=>{
   options = options||{}
   options.dir = options.src||'view'
   const engine = options.engine||'default'
@@ -11,6 +11,12 @@ export default async (options)=>{
   if('init' in renderEngine){
     renderEngine.init(options)
   }
+
+  // 如果livereload
+  if(isDev){
+    
+  }
+
   return async(ctx,next)=>{
     ctx.view = async function(filePath,data){
       data = data||{}
@@ -35,9 +41,13 @@ export default async (options)=>{
       // 3 编译
       const html = await renderEngine.compiled(sourceData,data,ctx)
       if(html){
+        if(isDev){
+          // TODO 注入livereload
+          html+=`<script > console.log("inject livereload")</script>`
+        }
         ctx.body = html
       }
     }
-    await next()
+    return next()
   }
 }
