@@ -1,6 +1,6 @@
 import {join} from "path"
 import {readFile} from "fs/promises"
-
+import { injectCode } from "../../libs/livereload.js"
 export default async (options,isDev)=>{
   options = options||{}
   options.dir = options.src||'view'
@@ -10,11 +10,6 @@ export default async (options,isDev)=>{
   // 如果有初始化方法则初始化
   if('init' in renderEngine){
     renderEngine.init(options)
-  }
-
-  // 如果livereload
-  if(isDev){
-    
   }
 
   return async(ctx,next)=>{
@@ -39,11 +34,12 @@ export default async (options,isDev)=>{
         sourceData = buffer?buffer.toString():''
       }
       // 3 编译
-      const html = await renderEngine.compiled(sourceData,data,ctx)
+      let html = await renderEngine.compiled(sourceData,data,ctx)
       if(html){
         if(isDev){
-          // TODO 注入livereload
-          html+=`<script > console.log("inject livereload")</script>`
+          // 开发模式注入livereload
+          // html+=`<script > console.log("inject livereload")</script>`
+          html+= injectCode()
         }
         ctx.body = html
       }

@@ -1,16 +1,21 @@
 import chokidar  from "chokidar"
 import deepmerge from "deepmerge"
-import WebSocket, { WebSocketServer } from 'ws'
+import { WebSocketServer } from 'ws'
 
-const defOptions = {
-  watchs:[],
+const defOption = {
+  host:'127.0.0.1',
   port:30211
 }
+let Option = null
 // 启动liveServer 
-export function startLiveServer(options,logger){
-  options = deepmerge(defOptions,options||{})
-  initWatcher(options.watchs)
-  initWebSockerServer(options.port)
+export function startLiveServer(option,server){
+  Option = deepmerge(defOption,option||{})
+  initWebSockerServer(server)
+  // initWatcher(Option.watchs)
+}
+// 注入客户端代码
+export function injectCode(){
+  return `<script>var ws = new WebSocket('ws://${Option.host}:${Option.port}')</script>`
 }
 
 // 初始化文件监控
@@ -31,14 +36,14 @@ function  initWatcher(watchs){
   })
 }
 // 初始化websocket服务
-function initWebSockerServer(port){
-  const wss = new WebSocketServer({port})
-  wss.on('connection', function connection(ws) {
+function initWebSockerServer(server){
+  const ws = new WebSocketServer({server})
+  ws.on('connection', function connection(ws) {
     ws.on('message', function message(data) {
       console.log('web socket received: %s', data);
     });
   
     ws.send('hello wss');
   });
-  return wss
+  return ws
 }

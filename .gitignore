@@ -8,6 +8,7 @@ yarn-error.log*
 # Dependency directories
 node_modules/
 package-lock.json
+pnpm-lock.yaml
 # TypeScript v1 declaration files
 # Optional npm cache directory
 .npm

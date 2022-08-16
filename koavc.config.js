@@ -2,6 +2,7 @@ import { rootDist } from "vuesfcbuilder"
 
 export default {
   //============ 服务器配置
+  host:'127.0.0.1',
   port:3000,
   // ==如果配置了https，将以https方式提供服务
   // https:{

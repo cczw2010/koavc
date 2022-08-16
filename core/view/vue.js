@@ -22,7 +22,7 @@ export default {
   },
   // 渲染
   async compiled(path,data,ctx){
-    const html = await renderer(path,data,ctx)
-    ctx.body = html
+    return await renderer(path,data,ctx)
+    // ctx.body = html
   }
 }
