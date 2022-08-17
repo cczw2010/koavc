@@ -4,7 +4,7 @@ view渲染模块,为koa上下文context提供模板加载功能
   server的`config.js`中配置 `server.view`
 
   {
-    dir,        //view模板文件根目录，默认 view
+    src,        //view模板文件根目录，默认 view
     engine      //模板渲染引擎，默认dafault
   }
 

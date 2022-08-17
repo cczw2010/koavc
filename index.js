@@ -19,7 +19,11 @@ export async function run(Config,isDev=false){
     if (err) {
       app.context.logger.error(err)
     } else {
-      app.context.logger.success('[server]',`server start success  at ${httpsOption?'https':'http'}://${host}:${port}.`);
+      // livereload
+      if(isDev){
+        startLiveServer(server)
+      }
+      app.context.logger.success('[server]',`server start success at ${httpsOption?'https':'http'}://${host}:${port}`);
       const muse = process.memoryUsage()
       const mstr = `{"rss":${muse.rss},"heapUsed":${muse.heapUsed}}`
       app.context.logger.info("memory:",chalk.grey(mstr))
@@ -32,10 +36,7 @@ export async function run(Config,isDev=false){
   }else{
     server = serverSchame.createServer(app.callback())
   }
-  if(isDev){
-    startLiveServer({host},server)
-  }
-  server.listen(port,host, cb);
+  server.listen(port,host, cb)
 }
 // 初始化参数设置
 export async function initConfig(){

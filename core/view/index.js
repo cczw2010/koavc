@@ -1,15 +1,22 @@
 import {join} from "path"
 import {readFile} from "fs/promises"
-import { injectCode } from "../../libs/livereload.js"
+import { initWatcher,injectCode } from "../../libs/livereload.js"
 export default async (options,isDev)=>{
   options = options||{}
-  options.dir = options.src||'view'
+  options.src = options.src||'view'
   const engine = options.engine||'default'
 
   const renderEngine = (await import(`./${engine}.js`)).default
   // 如果有初始化方法则初始化
   if('init' in renderEngine){
     renderEngine.init(options)
+  }
+
+  if(isDev){
+    const watches = ('getWatchs' in renderEngine)?renderEngine.getWatchs():options.src
+    console.log('watches------------->',watches)
+    const onChange = renderEngine.onWatchChange
+    initWatcher(options.src,{},onChange)
   }
 
   return async(ctx,next)=>{
@@ -38,8 +45,7 @@ export default async (options,isDev)=>{
       if(html){
         if(isDev){
           // 开发模式注入livereload
-          // html+=`<script > console.log("inject livereload")</script>`
-          html+= injectCode()
+          html+= injectCode(1111)
         }
         ctx.body = html
       }
