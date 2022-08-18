@@ -6,41 +6,52 @@ import {join} from "path"
 import {compiler,rootDist} from "vuesfcbuilder"
 import {run,initConfig} from "../index.js"
 const Config = await initConfig()
+
 switch (process.argv[2]) {
   case "build":
     if(Config.view.engine=="vue"){
-      consola.info(`vue complier with [${chalk.yellow('production')}] mode ⚙`)
+      consola.log(sysColor('vue builder start...'))
       Config.vuesfcbuilder.isDev = false
       compiler(false,Config.vuesfcbuilder)
     }else{
-      consola.info('View complier engine is not [vue], ignore vue complier! ')
+      consola.warn('View complier engine is not [vue], ignore vue complier! ')
     } 
     break;
   case "start":
+    consola.log(`> koavc run with [${chalk.yellow('production')}] mode`)
     if(Config.view.engine=="vue"){
       const vuebuilderConfig = await import(join(rootDist,'config.runtime.js'))
                               .then(m=>m.default)
                               .catch(e=>false)
       if(!vuebuilderConfig || vuebuilderConfig.isDev){
-        consola.error('Must run [build]  before publish server!')
+        consola.error('Must run [build] first in the [vue] mode!')
         process.exit(1)
       }
     }
+    consola.log(sysColor('Initilize server...'))
     run(Config)
     break;
   case "dev":
   case undefined:
+    consola.log(`> koavc run with [${chalk.yellow('development')}] mode ♻️`)
     if(Config.view.engine=="vue"){
-      consola.info(`vue complier with [${chalk.yellow('development')}] mode ♻️`)
+      consola.log(sysColor('vue builder start...'))
       Config.vuesfcbuilder.isDev = true
       compiler(true,Config.vuesfcbuilder,()=>{
+        consola.log(sysColor('Initilize server...'))
         run(Config,true)
       })
     }else{
+      consola.log(sysColor('Initilize server...'))
       run(Config,true)
     }
     break;
   default:
     consola.error("unkown command")
     break;
+}
+
+
+function sysColor(msg){
+  return chalk.green('☕️ '+msg)
 }

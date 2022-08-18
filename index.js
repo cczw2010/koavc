@@ -16,18 +16,18 @@ export async function run(Config,isDev=false){
   const port = Config.port
   const host = Config.host||'0.0.0.0'
   const cb  = (err)=>{
+    const logger = app.context.logger
     if (err) {
-      app.context.logger.error(err)
+      logger.error(err)
     } else {
       // livereload
       if(isDev){
         startLiveServer(server)
       }
-      app.context.logger.success('[server]',`server start success at ${httpsOption?'https':'http'}://${host}:${port}`);
       const muse = process.memoryUsage()
       const mstr = `{"rss":${muse.rss},"heapUsed":${muse.heapUsed}}`
-      app.context.logger.info("memory:",chalk.grey(mstr))
-      app.context.logger.info("cpu:\t",chalk.grey(JSON.stringify(process.cpuUsage())))
+      logger.success(chalk.green(`server start successful. ${httpsOption?'https':'http'}://${host}:${port}`));
+      logger.log(chalk.grey(`  memory:${mstr}\n  cpu:\t${JSON.stringify(process.cpuUsage())}`))
     } 
   }
   let server = null
@@ -40,7 +40,7 @@ export async function run(Config,isDev=false){
 }
 // 初始化参数设置
 export async function initConfig(){
-  consola.info('loading config')
+  // consola.info('loading config')
   defConfig.root = process.env.PWD
   const localConfig = await import(join(defConfig.root,"koavc.config.js"))
           .then(module=>module.default)

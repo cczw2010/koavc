@@ -13,16 +13,16 @@ export function startLiveServer(server){
   wsServer = new WebSocketServer({server})
   wsServer.on('connection', function(ws,request) {
     ws.on('message', function(data) {
-      console.debug('client message %s',data);
-      const infos = data.toString().split(":")
+      // console.debug('client message %s',data);
+      const infos = data.toString().split("::")
       if(infos[0]==CLIENTMSGTYPE.connect){
         ws.pageUUID = infos[1]||0
-        console.debug('client connected', ws.pageUUID );
+        // console.debug('client connected', ws.pageUUID );
       }
     })
-    ws.on('close',function(){
-      console.debug('client close', ws.pageUUID );
-    })
+    // ws.on('close',function(){
+    //   console.debug('client close', ws.pageUUID );
+    // })
   })
 }
 // 页面注入客户端代码
@@ -33,7 +33,7 @@ export function injectCode(pagePath){
   const pageUUID = getPageUUid(pagePath)
   console.log('inject code',pagePath,pageUUID)
   const address = wsServer.address()
-  return `<script>
+  return `<script type="text/javascript">
   var __livereload_uuid = '${pageUUID}'
   var __webSocket = WebSocket || MozWebSocket;
   var __limitReConnect = 50;
@@ -48,7 +48,7 @@ export function injectCode(pagePath){
       console.debug("> livereload actived!")
       __connectLock = false
       __reConnectCount = 0;
-      __ws_liveload.send('${CLIENTMSGTYPE.connect}:'+__livereload_uuid);
+      __ws_liveload.send('${CLIENTMSGTYPE.connect}::'+__livereload_uuid);
     };
     __ws_liveload.onmessage=function(event) {
       console.debug('received: %s', event.data);
@@ -58,6 +58,7 @@ export function injectCode(pagePath){
     };
     __ws_liveload.onclose=__ws_liveload.onerror=function(event) {
       __connectLock = false
+      clearTimeout(__ws_timer)
       __ws_timer = setTimeout(function(){
         if(__connectLock || __limitReConnect<__reConnectCount){return}
         __reConnectCount++
@@ -79,7 +80,7 @@ export function reloadPage(pagePath){
   console.debug("reloadPage：",pagePath,pageUUID)
   wsServer.clients.forEach(function(client) {
     if (client.readyState === 1 && client.pageUUID==pageUUID) { //WebSocket.OPEN
-      console.debug("client reload：",pagePath,client.pageUUID)
+      // console.debug("client reload：",pagePath,client.pageUUID)
       client.send(CLIENTMSGTYPE.reload);
     }
   });
@@ -99,11 +100,10 @@ export function  initWatcher(watchpath,option,onChange){
   },option)
   const watcher = chokidar.watch([].concat(watchpath),option)
   watcher.on('ready', () => {
-    console.debug("livereload server start...",watcher.getWatched())
+    // console.debug("livereload server start...",watcher.getWatched())
     watcher.on('change', (filepath,fstats)=>{
-      console.log('changer.....',filepath)
       filepath = onChange(filepath,fstats)
-      console.log('changer1.....',filepath)
+      // console.log('changer1.....',filepath)
       if(filepath){
         reloadPage(filepath)
       }

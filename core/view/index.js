@@ -14,8 +14,8 @@ export default async (options,isDev)=>{
 
   if(isDev){
     const watches = ('getWatchs' in renderEngine)?renderEngine.getWatchs():options.src
-    console.log('watches------------->',watches)
     const onChange = renderEngine.onWatchChange || function(filePath){
+      // 使用全路径，防止不统一
       return join(process.env.PWD,filePath)
     }
     initWatcher(watches,{},onChange)
@@ -28,6 +28,7 @@ export default async (options,isDev)=>{
       if('transferPath' in renderEngine){
         filePath = renderEngine.transferPath(filePath)
       }else{
+        // 使用全路径，防止不统一
         filePath =  join(ctx.Config.root,options.src,filePath)
       }
       // console.log(source)

@@ -19,7 +19,7 @@ export async function initialize(Config,isDev){
   app.context.logger =logger
   // 加载alias中间件
   if(Config.alias){
-    logger.info("load alias middleware")
+    logger.info("load alias")
     app.use(await alias(Config.alias,logger))
   }
   // 动态加载所有的配置middleware
