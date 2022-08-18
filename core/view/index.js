@@ -15,8 +15,10 @@ export default async (options,isDev)=>{
   if(isDev){
     const watches = ('getWatchs' in renderEngine)?renderEngine.getWatchs():options.src
     console.log('watches------------->',watches)
-    const onChange = renderEngine.onWatchChange
-    initWatcher(options.src,{},onChange)
+    const onChange = renderEngine.onWatchChange || function(filePath){
+      return join(process.env.PWD,filePath)
+    }
+    initWatcher(watches,{},onChange)
   }
 
   return async(ctx,next)=>{
@@ -43,9 +45,12 @@ export default async (options,isDev)=>{
       // 3 编译
       let html = await renderEngine.compiled(sourceData,data,ctx)
       if(html){
+        // 开发模式注入livereload
         if(isDev){
-          // 开发模式注入livereload
-          html+= injectCode(1111)
+          const injectJs = injectCode(filePath)
+          if(injectJs){
+            html+=injectJs
+          }
         }
         ctx.body = html
       }
