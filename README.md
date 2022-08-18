@@ -13,7 +13,7 @@ npm install koavc --save
 npx koavc start
 #编译vue文件
 npx koavc build
-#编译vue文件  watching 模式
+# 开发模式.1.3.0开始支持简单的liveload
 npx koavc dev
 ```
 
