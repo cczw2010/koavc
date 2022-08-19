@@ -146,7 +146,7 @@ view:{
   src:'view',
   <!-- 渲染引擎 default | lodash | vue ，可自行拓展  -->
   engine:'vue',
-  // 页面静态化缓存，传入false关闭,true使用默认参数
+  // 页面静态化缓存，传入false关闭,true使用默认参数, (version:1.3.1)
   cache:{
     dir:'.koavc/pagecache',  //默认
     ttl:1000*60*60*12        //默认
