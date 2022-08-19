@@ -35,8 +35,13 @@ export default {
  
   //============view渲染配置  
   view:{
-    src:'view',      //相对于根目录
-    engine:'default'    //渲染引擎 default | lodash | vue 可自行拓展
+    src:'view',         //相对于根目录
+    engine:'default',   //渲染引擎 default | lodash | vue 可自行拓展
+    // 页面静态化缓存，传入false关闭
+    cache:{
+      dir:'.koavc/pagecache',
+      ttl:1000*60*60*12
+    }
   },
   middlewares:{},
   // 设置静态目录服务

@@ -71,9 +71,8 @@ export default async function(option,logger){
     const redirecTo = getAlias(originPath)
     if(redirecTo){
       ctx.path = redirecTo
-      return next().then(()=>{
-        ctx.path = originPath
-      })
+      await next()
+      ctx.path = originPath
     }
     // no redirect, 注入方法
     ctx.alias = Alias

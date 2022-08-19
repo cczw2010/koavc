@@ -1,6 +1,6 @@
 import http from "http"
 import https from "https"
-import {join} from "path"
+import {resolve} from "path"
 import deepmerge from "deepmerge"
 import consola from "consola"
 import {initialize} from "./core/index.js"
@@ -41,8 +41,7 @@ export async function run(Config,isDev=false){
 // 初始化参数设置
 export async function initConfig(){
   // consola.info('loading config')
-  defConfig.root = process.env.PWD
-  const localConfig = await import(join(defConfig.root,"koavc.config.js"))
+  const localConfig = await import(resolve("./koavc.config.js"))
           .then(module=>module.default)
           .catch(e=>{
             consola.error(e)
