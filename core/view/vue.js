@@ -40,7 +40,7 @@ export default {
         return false
       }
       const diffs = updatedDiff(clientManifest,newManifest)
-      console.log('vue  clientManifest>>>>>>',diffs)
+      // console.log('vue  clientManifest>>>>>>',diffs)
       clientManifest = newManifest
       for (const page in diffs) {
         if(page!='root')

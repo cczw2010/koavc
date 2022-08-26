@@ -1,4 +1,4 @@
-import {join} from "path"
+import {join,resolve} from "path"
 import {readFile} from "fs/promises"
 import { initWatcher,injectCode } from "../../libs/livereload.js"
 import ViewCache from '../../libs/viewcache.js'

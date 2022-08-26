@@ -31,7 +31,7 @@ export function injectCode(pagePath){
     return false
   }
   const pageUUID = getPageUUid(pagePath)
-  console.log('inject code',pagePath,pageUUID)
+  // console.log('inject code',pagePath,pageUUID)
   const address = wsServer.address()
   return `<script type="text/javascript">
   var __livereload_uuid = '${pageUUID}'
