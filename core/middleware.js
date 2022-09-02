@@ -9,6 +9,15 @@ const projectRoot = process.env.PWD
  *                        返回默认初始化函数支持原生Promise
  */
 export default async function(options,app){
+  // 自定义中间件通用方法，内置，用于获取自定义组件定义的controller属性
+  app.use((ctx,next)=>{
+    ctx.__getControllerParam = function(){
+
+    }
+    return next()
+  })
+
+  // 加载所有的全局配置中间件
   options = options||[]
   let cnt = 0
   app.context.logger.info("loading global middlewares...")
@@ -44,13 +53,26 @@ export async function loadMiddleware(middlewareOption){
     middlewarePath = middlewareOption[0]
     option = middlewareOption[1]
   }
+
   middlewarePath = middlewarePath.replace(/^~/ig,projectRoot)
-  const middleware = await import(middlewarePath).then(module=>module.default)
-  if(middleware instanceof Promise){
-    return await middleware(option)
-  }else if(middleware instanceof Function){
-    return middleware(option)
-  }else{
-    return false
+  const {default:middlewareInit,param} = await import(middlewarePath).then(module=>module)
+
+  // 创建this绑定对象
+  let middleware = null
+  if(middlewareInit instanceof Promise){
+    middleware = await middlewareInit(option)
+  }else if(middlewareInit instanceof Function){
+    middleware = middlewareInit(option)
   }
+  if(middleware){
+    const thisObj = {
+      name:Date.now(),
+      get param(){
+        return 
+      }
+    }
+    // 包装中间件，主要用于注入this对象, 因为返回的函数很可能是箭头函数
+    return await middleware.bind(thisObj)
+  }
+  return null
 }
