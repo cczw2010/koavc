@@ -56,13 +56,8 @@ async function travel(dir) {
       //3 middlewares
       if(m.middlewares){
         for (const item of m.middlewares) {
-          if(Array.isArray(item)){
-              const middleware = await loadMiddleware(key,item[key])
-              middleware && params.push(middleware)
-          }else{
-            const middleware = await loadMiddleware(item)
-            middleware && params.push(middleware)
-          }
+          const middleware = await loadMiddleware(item)
+          middleware && params.push(middleware)
         }
       }
       // 4 fn 实际页面逻辑中间件方法

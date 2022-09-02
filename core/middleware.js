@@ -11,21 +11,14 @@ const projectRoot = process.env.PWD
 export default async function(options,app){
   options = options||[]
   let cnt = 0
-  app.context.logger.info("loading user middlewares...")
-  for (const key in options) {
-    const item = options[key]
-    let middlewarePath= item
-    let moption = null
-    if(Array.isArray(item)){
-      middlewarePath = item[0]
-      moption = item[1]||null
-    }
-    const middleware = await loadMiddleware(middlewarePath,moption).catch(e=>{
-      app.context.logger.error(middlewarePath,e)
+  app.context.logger.info("loading global middlewares...")
+  for (const item of options) {
+    const middleware = await loadMiddleware(item).catch(e=>{
+      app.context.logger.error(item,e)
       return false
     })
     if(!middleware){
-      app.context.logger.warn(`ignored invalid middleware [${middlewarePath}]`)
+      app.context.logger.warn(`ignored invalid middleware [${item}]`)
     }else{
       app.use(middleware)
       cnt++
@@ -35,13 +28,21 @@ export default async function(options,app){
 
 /**
  * 加载koa的middlleware ，支持返回初始化函数为原生Promise
- * @param {string} middlewarePath   ~开头的代表相对于项目根目录的自定义组件， 或者可以直接使用安装的第三方中间件
- * @param {any} option    middleware的初始化传参                       
+ * @param {function|string|array} middlewareOption  
+ *   function 直接传入中间件方法
+ *   string 传入中间件路径(middlewarePath) ，~开头的代表相对于项目根目录的自定义组件
+ *   array 如果自定义的中间件需要传入参数，以数组方式传入 [middlewarePath,option]
  * 
  *  */ 
-export async function loadMiddleware(middlewarePath,option){
-  if(typeof middlewarePath == "function"){
-    return middlewarePath
+export async function loadMiddleware(middlewareOption){
+  if(typeof middlewareOption == "function"){
+    return middlewareOption
+  }
+  let middlewarePath = middlewareOption
+  let option = null
+  if(Array.isArray(middlewareOption)){
+    middlewarePath = middlewareOption[0]
+    option = middlewareOption[1]
   }
   middlewarePath = middlewarePath.replace(/^~/ig,projectRoot)
   const middleware = await import(middlewarePath).then(module=>module.default)
