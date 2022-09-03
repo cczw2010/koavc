@@ -6,6 +6,9 @@ import { readdir,stat } from 'fs/promises'
 import Router from '@koa/router'
 import {loadMiddleware,middlewaresLoader} from "./middleware.js"
 
+// controller固定的属性
+const constants = ['name','alias','middlewares','fn','method']
+
 let RootDir = null
 let Logger = null
 export default async (config,logger)=>{
@@ -72,7 +75,15 @@ async function travel(dir,router) {
       }
       // 5 add router
       const method = m.method?m.method.toLowerCase():'all'
-      router[method](...params)
+      const result = router[method](...params)
+      // 6 ext params 
+      const extparams = {}
+      for (const key in m) {
+        if(!constants.contains(key)){
+          extparams[key] = m[key]
+        }
+      }
+      result.stack[result.stack.length-1]._extparams = extparams
     }
   }
 }
