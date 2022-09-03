@@ -41,7 +41,7 @@ controller
 `路由文件` 就是每个controller下的每个js文件， 是提供给`@koa/router`使用的，格式如下:
 
 ```
-export default{
+export default {
     // 路由命名,参见`@koa/router`的说明，可选
     name:'',
     // 单独设定固定seo别名，不要为泛域名添加该选项，可选
@@ -70,24 +70,19 @@ router:{
     ...
     // 是否只执行最后一个匹配的。默认全部匹配的都回执行。[_]开头的在前面先执行
     // V1.3.3 不建议修改，否则全局路由中间件将失效
-    exclusive:false,
+    exclusive:false, //默认
   }
-  // V1.3.3 新增， 全局路由中间件,这里的中间件可以访问router
+  // V1.3.3 新增， 全局路由中间件,这里的中间件可以访问router，前提是 option的 exclusive:false
   middlewares:[]
 },
 ...
 ```
 
-### 中间件
-
-中间件支持两种`本地中间件`和`第三方中间件`。本地中间件文件要求返回一个默认的初始化函数，用于加载配置文件初始化并返回最终中间件函数。 支持[async function]。
-
-
 ### 中间件配置
-  
-在`koavc.config.js`中可配置koa(`middlewares`)或者路由的全局中间件(`router.middlewares`)，，在`路由文件`中配置的中间件只在当前路由中生效，配置格式，格式如下：
 
-```
+在`koavc.config.js`中可配置koa(`middlewares`)或者路由的全局中间件(`router.middlewares`)，或者在`controller路由文件`中配置的中间件只在当前路由中生效，中间件支持两种`本地中间件`和`第三方中间件`。本地中间件文件要求返回一个默认的初始化函数，用于加载配置文件初始化并返回最终中间件函数。 支持[async function]。配置方法如下：
+
+```javascript
 import etag from "koa-etag"
 ...
 middlewares:[
@@ -96,7 +91,42 @@ middlewares:[
 etag(),                                 //3 直接传入第三方中间件
 ]
 ...
-```  
+```
+
+### KOA中间件
+
+用于koa的中间件，对应配置文件中的`middlewares`，在router初始化之前加载
+
+### 路由中间件
+
+路由中间件可以有两种调用方式，
+
+* 一种在controller中针对某个路由设置中间件（具体查看controller文件介绍）， 
+
+* 一种是V1.3.3 新增，的针对路由全局的中间件，对应配置文件中的`router.middlewares`。注意出于设计考虑，**前提是router配置中的router.option.exclusive 为false（默认）** 才会生效。下面详细介绍一下：
+
+这里的中间件可以访问router，且在controller方法执行之前加载，并新增了`controller` 扩展属性功能，可以方便的对controller进行预处理及个性化操作。eg：
+
+```javascript
+##------- controller => home.js
+export default {
+  method:'get',
+  auth:false,         //扩展参数
+  fn:(ctx,next)=>{}
+}
+
+##------- middleware => auth.js
+...
+<!-- 路由中间件中获取controller扩展参数，注意该方法只会取匹配的路由中最后一个的对应扩展参数，所以要注意路由匹配重叠 -->
+if(ctx.getControllerExtParam("auth")===false){   //false
+  return next()
+}else{
+  ctx.body="not login"
+}
+...
+
+
+```
 
 
 ### alias
@@ -105,7 +135,7 @@ etag(),                                 //3 直接传入第三方中间件
 
 *** 配置
 
-```
+```javascript
 alias: {
  //可选，初始化获取alias列表对象的方法，格式{aliasPath:directTo},不提供的话为空,
  get:asyncFunction
@@ -121,7 +151,7 @@ alias: {
 
 1、**在controller路由文件使用 `ctx.view` 方法来渲染模板文件**
 
-```
+```javascript
 /**
  *	渲染模板
  * `viewpath` : 模板文件的相对于`view`根目录的相对路径
@@ -133,11 +163,11 @@ ctx.view(viewpath,data)
 ```
 
 2、**模板引擎支持**
-  
+
   * **`default`** 无引擎，
   * **`lodash`**  基于lodash.Template的极简模板引擎
- 
-  ```
+
+  ```javascript
   <% [js code] %> ,<%=[js variables]%>
   
   ```
@@ -147,7 +177,7 @@ ctx.view(viewpath,data)
 
 3、 **配置**
 
-```
+```javascript
 <!-- 相关engine初始化时传入 -->
 view:{
   <!-- 模板文件的默认根目录地址，（vue是在vuesfcbuilder总独立配置的）-->
@@ -171,7 +201,7 @@ statics:[
 ]
     
 ```
- 
+
 
 ### API
 
@@ -183,15 +213,17 @@ api都注入到了`context`上
 #### context.logger
 同过consola实现的logger日志方法,可通过配置文件的logger选项设置，支持console和file两种日志方式，默认配置如下：
 
-    {
-      tag:"koavc",     // tag标签
-      level:4,            // consola的level
-      console:true,       // console日志
-      file:{              // 为false关闭文件日志
-        dateFormat:'HH:mm:ss',   //时间戳格式
-        dir:'logs',       // 日志目录
-      }
-    }
+```javascript
+{
+  tag:"koavc",     // tag标签
+  level:4,            // consola的level
+  console:true,       // console日志
+  file:{              // 为false关闭文件日志
+    dateFormat:'HH:mm:ss',   //时间戳格式
+    dir:'logs',       // 日志目录
+  }
+}
+```
 
 #### context.alias
 路由别名映射对象,路径都是相对于根目录
@@ -204,6 +236,9 @@ ctx.alias.list()
 
 #### context.view(tplPath,data)
 根据配置的渲染引擎，加载渲染模板
+
+#### context.getControllerExtParam(paramName)  :v1.3.3
+用于router的中间件中，可以获取最后一个匹配的router对应的controller的自定义扩展属性
 
 ### DEMO
 

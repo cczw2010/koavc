@@ -5,7 +5,7 @@ import {relative,join} from "path"
 import { readdir,stat } from 'fs/promises'
 import Router from '@koa/router'
 import {loadMiddleware,middlewaresLoader} from "./middleware.js"
-
+import {default as injectControllerMiddleware,setControllerExtParams} from "../middlewares/injectController.js"
 // controller固定的属性
 const constants = ['name','alias','middlewares','fn','method']
 
@@ -15,12 +15,18 @@ export default async (config,logger)=>{
   RootDir = config.dir,
   Logger = logger||console
   const router = new Router(config.option)
-  Logger.info("loading router global middlewares...")
-  await middlewaresLoader(config.middlewares,router).catch(e=>{
-    Logger.error(e)
-    process.exit(0)
-  })
-  Logger.info("loading router controllers...")
+  // exclusive为false 注入全局route支持
+  if(!config.option.exclusive){
+    router.use(injectControllerMiddleware)
+    Logger.info("loading router global middlewares...")
+    await middlewaresLoader(config.middlewares,router).catch(e=>{
+      Logger.error(e)
+      process.exit(0)
+    })
+  }else{
+    Logger.warn("router global middlewares support is closed.")
+  }
+  Logger.info("loading router controllers...")  
   await travel(RootDir,router)
   return router.routes()
 }
@@ -76,17 +82,20 @@ async function travel(dir,router) {
       // 5 add router
       const method = m.method?m.method.toLowerCase():'all'
       const result = router[method](...params)
-      // 6 ext params 
-      const extparams = {}
-      for (const key in m) {
-        if(!constants.contains(key)){
-          extparams[key] = m[key]
+      // 6 ext params  v1.3.3
+      if(!result.opts.exclusive){
+        const extparams = {}
+        for (const key in m) {
+          if(!constants.includes(key)){
+            extparams[key] = m[key]
+          }
         }
+        setControllerExtParams(result.stack[result.stack.length-1],extparams)
       }
-      result.stack[result.stack.length-1]._extparams = extparams
     }
   }
 }
+
 
 
 

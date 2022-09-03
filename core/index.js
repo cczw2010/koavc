@@ -1,7 +1,7 @@
 import { resolve} from 'path'
 import Koa from "koa"
 import {createLogger} from '../libs/logger.js'
-import controller from './controller.js'
+import loadControllers from './controller.js'
 import viewer from './view/index.js'
 import alias from '../middlewares/alias.js'
 import { middlewaresLoader } from './middleware.js'
@@ -25,7 +25,7 @@ export async function initialize(Config,isDev){
   }
   // 加载alias中间件
   if(Config.alias){
-    logger.info("load alias...")
+    // logger.debug("load alias...")
     app.use(await alias(Config.alias,logger))
   }
   // 加载全局中间件
@@ -37,9 +37,8 @@ export async function initialize(Config,isDev){
   app.context.view = await viewer(Config.view,isDev)
   // 初始化controller
   Config.router.dir = resolve(Config.router.dir)
-  const router = await controller(Config.router,logger)
+  const router = await loadControllers(Config.router,logger)
   app.use(router)
-  // app.router = router
   return app
 }
 
