@@ -1,40 +1,25 @@
-// 中间件加载
-
-const projectRoot = process.env.PWD
 /**
  * 加载并初始化所有配置的middleware
  * @export
- * @param {array} options middleware配置数组,['~/middlewares/xxx.js',['koa-body',{...参数}]]
- *                        ~开头的代表相对于根目录的自定义组件， 或者可以直接使用安装的第三方中间件， 可传参。
- *                        返回默认初始化函数支持原生Promise
+ * @param {array[string|array|function]} options 
+ *            middleware配置数组,['~/middlewares/xxx.js',['koa-body',{...参数}]]
+ *            ~开头的代表相对于根目录的自定义组件， 或者可以直接使用安装的第三方中间件， 可传参。
+ *            返回默认初始化函数支持原生Promise
+ * 
+ * @param {Object|null} ctx 可以是koa,app，也可以是router ,设置的话自动use
+ * @return Promise
  */
-export default async function(options,app){
-  // 自定义中间件通用方法，内置，用于获取自定义组件定义的controller属性
-  app.use((ctx,next)=>{
-    ctx.__getControllerParam = function(){
-
-    }
-    return next()
-  })
-
+ export async function middlewaresLoader(options,ctx){
   // 加载所有的全局配置中间件
   options = options||[]
-  let cnt = 0
-  app.context.logger.info("loading global middlewares...")
   for (const item of options) {
-    const middleware = await loadMiddleware(item).catch(e=>{
-      app.context.logger.error(item,e)
-      return false
-    })
+    const middleware = await loadMiddleware(item)
     if(!middleware){
-      app.context.logger.warn(`ignored invalid middleware [${item}]`)
-    }else{
-      app.use(middleware)
-      cnt++
+      throw new Error(`ignored invalid middleware [${item}]`)
     }
+    ctx.use(middleware)
   }
 }
-
 /**
  * 加载koa的middlleware ，支持返回初始化函数为原生Promise
  * @param {function|string|array} middlewareOption  
@@ -54,7 +39,7 @@ export async function loadMiddleware(middlewareOption){
     option = middlewareOption[1]
   }
 
-  middlewarePath = middlewarePath.replace(/^~/ig,projectRoot)
+  middlewarePath = middlewarePath.replace(/^~/ig,process.env.PWD)
   const {default:middlewareInit,param} = await import(middlewarePath).then(module=>module)
 
   // 创建this绑定对象
@@ -64,15 +49,5 @@ export async function loadMiddleware(middlewareOption){
   }else if(middlewareInit instanceof Function){
     middleware = middlewareInit(option)
   }
-  if(middleware){
-    const thisObj = {
-      name:Date.now(),
-      get param(){
-        return 
-      }
-    }
-    // 包装中间件，主要用于注入this对象, 因为返回的函数很可能是箭头函数
-    return await middleware.bind(thisObj)
-  }
-  return null
+  return middleware
 }

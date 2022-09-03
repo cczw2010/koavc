@@ -17,9 +17,11 @@ export default {
     option:{
       // host:'',
       // prefix:'',
-      //是否只执行最后一个匹配的。不建议修改，否则路由规则可能会超出预想。因为路由模块获取文件list路由的时候 带_的泛路由文件名会在最前面，所以，执行最后一个正好不会覆盖实名路由
-      exclusive:true,
+      // V1.3.3 不建议修改，否则全局路由中间件将失效
+      exclusive:false,
     },
+     // V1.3.3 新增， 全局路由中间件,这里的中间件可以访问router
+     middlewares:[]
   },
   // alias:{},
   //============日志
@@ -43,7 +45,8 @@ export default {
       ttl:1000*60*60*12
     }
   },
-  middlewares:{},
+  // 全局koa中间件，在route之前执行
+  middlewares:[],
   // 设置静态目录服务
   statics:[
     ['/static',rootDist],   //vue输出目录挂载到`/static`路由上

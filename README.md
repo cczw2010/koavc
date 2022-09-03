@@ -42,16 +42,18 @@ controller
 
 ```
 export default{
-    // 路由命名，可选,参见`@koa/router`的说明
+    // 路由命名,参见`@koa/router`的说明，可选
     name:'',
-    // seo别名，不建议泛域名添加该选项，可选
+    // 单独设定固定seo别名，不要为泛域名添加该选项，可选
     alias:'user-upload',
-    // 路由的请求method，可选，默认all
+    // 路由的请求method，默认all，可选
     method:"get",
-    // 本路由专用的中间件数组, 详细查看中间件部分介绍
+    // 本路由专用的中间件数组, 详细查看中间件部分介绍，可选
     middlewares:['~/upload.js',session()]
+    //路由实际逻辑部分
     fn:async (ctx,next)=>{
         ctx.body = 'login page';
+        //ctx.view("pages/index",{...datas})
     }
 }
 ```
@@ -65,33 +67,39 @@ router:{
   dir:"controller",
   <!-- @koa/router中间件的配置 -->
   option:{
-    // host:'',
-    // prefix:'',
-    //不建议修改，否则路由规则可能会超出预想。因为路由模块获取文件list路由的时候 带_的泛路由文件名会在最前面，所以，执行最后一个正好不会覆盖实名路由
-    exclusive:true,
+    ...
+    // 是否只执行最后一个匹配的。默认全部匹配的都回执行。[_]开头的在前面先执行
+    // V1.3.3 不建议修改，否则全局路由中间件将失效
+    exclusive:false,
   }
+  // V1.3.3 新增， 全局路由中间件,这里的中间件可以访问router
+  middlewares:[]
 },
 ...
 ```
 
-
-
 ### 中间件
+
+中间件支持两种`本地中间件`和`第三方中间件`。本地中间件文件要求返回一个默认的初始化函数，用于加载配置文件初始化并返回最终中间件函数。 支持[async function]。
+
+
+### 中间件配置
   
-  中间件为koa的中间件，可以在配置文件中配置全局加载，也可以在`路由文件`中自定义加载。 中间件支持两种`本地中间件`和`第三方中间件`。 在`koavc.config.js`中的 middlewares选项中可以配置全局加载的中间件列表，在`路由文件`中配置的中间件只在当前路由中生效，配置格式，格式如下：
+在`koavc.config.js`中可配置koa(`middlewares`)或者路由的全局中间件(`router.middlewares`)，，在`路由文件`中配置的中间件只在当前路由中生效，配置格式，格式如下：
 
 ```
 import etag from "koa-etag"
 ...
 middlewares:[
-'~/middlewares/upload.js',              //本地引入以~开头表示项目根目录,【注意】！本地中间件文件返回一个默认的初始化方法，方法执行后返回中间件方法
-['~/middlewares/auth.js',{...options}]  //数组格式的话，第二个值代表传入的参数
-etag(),                                 //直接传入第三方中间件
+'~/middlewares/upload.js',              //1 本地引入以~开头表示项目根目录,【注意】！本地中间件文件返回一个默认的初始化方法，方法执行后返回中间件方法
+['~/middlewares/auth.js',{...options}]  //2 数组格式的话，第二个值代表传入的参数
+etag(),                                 //3 直接传入第三方中间件
 ]
 ...
 ```  
 
-### alias中间件
+
+### alias
 
 为了支持seo,内置实现了个简单的 `alias`中间件最为路由映射使用，如果想加载只需增加响应配置即可，也提供了api可以动态更新路由映射，具体参考API部分
 

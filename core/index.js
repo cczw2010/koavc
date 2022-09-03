@@ -3,8 +3,8 @@ import Koa from "koa"
 import {createLogger} from '../libs/logger.js'
 import controller from './controller.js'
 import viewer from './view/index.js'
-import middlewareLoader from "./middleware.js"
 import alias from '../middlewares/alias.js'
+import { middlewaresLoader } from './middleware.js'
 import staticServe from "koa-static"
 import mount from "koa-mount"
 
@@ -23,21 +23,23 @@ export async function initialize(Config,isDev){
       app.use(mount(staticInfo[0],staticServe(staticInfo[1])),{defer:true})
     }
   }
-  // 增加
   // 加载alias中间件
   if(Config.alias){
-    logger.info("load alias")
+    logger.info("load alias...")
     app.use(await alias(Config.alias,logger))
   }
-  // 动态加载所有的配置middleware
-  await middlewareLoader(Config.middlewares,app)
+  // 加载全局中间件
+  await middlewaresLoader(Config.middlewares,app,logger).catch(e=>{
+    logger.error(e)
+    process.exit(0)
+  })
   // 初始化view
   app.context.view = await viewer(Config.view,isDev)
   // 初始化controller
   Config.router.dir = resolve(Config.router.dir)
   const router = await controller(Config.router,logger)
   app.use(router)
-
+  // app.router = router
   return app
 }
 
