@@ -10,20 +10,20 @@
  * @return Array  返回middleware数组
  */
  export async function middlewaresLoader(options,ctx){
-  const middlewares = []
+  let result = []
   // 加载所有的全局配置中间件
   options = options||[]
   for (const item of options) {
-    const middleware = await loadMiddleware(item)
-    if(!middleware){
+    let middlewares = await loadMiddleware(item)
+    if(!middlewares || middlewares.length==0){
       throw new Error(`ignored invalid middleware [${item}]`)
     }
     if(ctx){
-      ctx.use(middleware)
+      middlewares.map(m=>ctx.use(m))
     }
-    middlewares.push(middleware)
+    result = result.concat(middlewares)
   }
-  return middlewares
+  return result
 }
 /**
  * 加载koa的middlleware ，支持返回初始化函数为原生Promise
@@ -31,11 +31,11 @@
  *   function 直接传入中间件方法
  *   string 传入中间件路径(middlewarePath) ，~开头的代表相对于项目根目录的自定义组件
  *   array 如果自定义的中间件需要传入参数，以数组方式传入 [middlewarePath,option]
- * 
+ * @return Array<middleware>  返回中间件数组
  *  */ 
-export async function loadMiddleware(middlewareOption){
+async function loadMiddleware(middlewareOption){
   if(typeof middlewareOption == "function"){
-    return middlewareOption
+    return [middlewareOption]
   }
   let middlewarePath = middlewareOption
   let option = null
@@ -47,12 +47,12 @@ export async function loadMiddleware(middlewareOption){
   middlewarePath = middlewarePath.replace(/^~/ig,process.env.PWD)
   const {default:middlewareInit,param} = await import(middlewarePath).then(module=>module)
 
-  // 创建this绑定对象
-  let middleware = null
+  // 执行初始化方法返回中间件，v1.3.4支持返回多个中间件数组,方便集成其他中间件
+  let middlewares = null
   if(middlewareInit instanceof Promise){
-    middleware = await middlewareInit(option)
+    middlewares = await middlewareInit(option)
   }else if(middlewareInit instanceof Function){
-    middleware = middlewareInit(option)
+    middlewares = middlewareInit(option)
   }
-  return middleware
+  return middlewares
 }

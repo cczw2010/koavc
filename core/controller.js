@@ -4,7 +4,7 @@
 import {relative,join} from "path"
 import { readdir,stat } from 'fs/promises'
 import Router from '@koa/router'
-import {loadMiddleware,middlewaresLoader} from "./middleware.js"
+import {middlewaresLoader} from "./middleware.js"
 import {setControllerExtParams} from "../middlewares/injectController.js"
 // controller固定的属性
 const constants = ['name','alias','middlewares','fn','method']
@@ -69,11 +69,9 @@ async function travel(dir,router) {
       }
       params.push(paths)
       //3 middlewares
-      if(m.middlewares){
-        for (const item of m.middlewares) {
-          const middleware = await loadMiddleware(item)
-          middleware && params.push(middleware)
-        }
+      if(m.middlewares && m.middlewares.length>0){
+        const middlewares = await middlewaresLoader(m.middlewares)
+        middlewares.map(m=> params.push(m))
       }
       // 4 fn 实际页面逻辑中间件方法
       if(m.fn){
