@@ -3,11 +3,13 @@ const extKeyName = "_extparams"
 /**
  * 注入获取扩展参数方法(ctx.getControllerExtParam)只有进入router中有效,只最后一个匹配的router的参数，
  **/
-export default (ctx,next)=>{
-  ctx.getControllerExtParam = function(paramName){
-    return getControllerExtParam(this,paramName)
+export default function(){
+  return (ctx,next)=>{
+    ctx.getControllerExtParam = function(paramName){
+      return getControllerExtParam(this,paramName)
+    }
+    return next()
   }
-  return next()
 }
 
 /**

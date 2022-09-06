@@ -5,7 +5,7 @@ import {relative,join} from "path"
 import { readdir,stat } from 'fs/promises'
 import Router from '@koa/router'
 import {loadMiddleware,middlewaresLoader} from "./middleware.js"
-import {default as injectControllerMiddleware,setControllerExtParams} from "../middlewares/injectController.js"
+import {setControllerExtParams} from "../middlewares/injectController.js"
 // controller固定的属性
 const constants = ['name','alias','middlewares','fn','method']
 
@@ -17,12 +17,12 @@ export default async (config,logger)=>{
   const router = new Router(config.option)
   // exclusive为false 注入全局route支持
   if(!config.option.exclusive){
-    router.use(injectControllerMiddleware)
     Logger.info("loading router global middlewares...")
-    await middlewaresLoader(config.middlewares,router).catch(e=>{
+    const middlewares = await middlewaresLoader(config.middlewares).catch(e=>{
       Logger.error(e)
       process.exit(0)
     })
+    router.use(middlewares)
   }else{
     Logger.warn("router global middlewares support is closed.")
   }

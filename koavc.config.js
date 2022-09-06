@@ -21,7 +21,7 @@ export default {
       exclusive:false,
     },
      // V1.3.3 新增， 全局路由中间件,这里的中间件可以访问router, 前提是 option的 exclusive:false
-     middlewares:[]
+     middlewares:['../middlewares/injectController.js'],
   },
   // alias:{},
   //============日志
