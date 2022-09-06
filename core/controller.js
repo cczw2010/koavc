@@ -28,7 +28,7 @@ export default async (config,logger)=>{
   }
   Logger.info("loading router controllers...")  
   await travel(RootDir,router)
-  return router.routes()
+  return router
 }
 
 // 遍历加载controller

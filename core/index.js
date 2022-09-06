@@ -14,7 +14,6 @@ export async function initialize(Config,isDev){
   app.on('error', (err, ctx) => {
     logger.error( err)
   })
-
   app.context.Config = Config
   app.context.logger =logger
   // 初始化静态服务，放上面,下面的中间件就不会相应静态服务的内容了
@@ -38,7 +37,8 @@ export async function initialize(Config,isDev){
   // 初始化controller
   Config.router.dir = resolve(Config.router.dir)
   const router = await loadControllers(Config.router,logger)
-  app.use(router)
+  app.use(router.routes())
+  app.use(router.allowedMethods(Config.router.allowedMethods))
   return app
 }
 

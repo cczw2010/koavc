@@ -68,12 +68,13 @@ router:{
   <!-- @koa/router中间件的配置 -->
   option:{
     ...
-    // 是否只执行最后一个匹配的。默认全部匹配的都回执行。[_]开头的在前面先执行
-    // V1.3.3 不建议修改，否则全局路由中间件将失效
-    exclusive:false, //默认
+    // 是否只执行最后一个匹配的，默认全部匹配的都回执行。[_]开头的controller在前面先执行
+    exclusive:false, //默认,不建议修改
   }
-  // V1.3.3 新增， 全局路由中间件,这里的中间件可以访问router，前提是 option的 exclusive:false
-  middlewares:[]
+  // V1.3.3 全局路由中间件,这里的中间件可以访问router，前提是 option的 exclusive:false
+  middlewares:[],
+  // v1.3.4 router的allowedMethods配置
+  allowedMethods:{},
 },
 ...
 ```

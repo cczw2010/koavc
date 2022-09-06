@@ -20,8 +20,10 @@ export default {
       // V1.3.3 不建议修改，否则全局路由中间件将失效
       exclusive:false,
     },
-     // V1.3.3 新增， 全局路由中间件,这里的中间件可以访问router, 前提是 option的 exclusive:false
-     middlewares:['../middlewares/injectController.js'],
+    // v1.3.4 router的allowedMethods配置
+    allowedMethods:{},
+    // V1.3.3 新增， 全局路由中间件,这里的中间件可以访问router, 前提是 option的 exclusive:false
+    middlewares:['../middlewares/injectController.js']
   },
   // alias:{},
   //============日志
