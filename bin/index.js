@@ -5,6 +5,7 @@ import chalk from "chalk"
 import {join} from "path"
 import {compiler,rootDist} from "vuesfcbuilder"
 import {run,initConfig} from "../index.js"
+import runDev from "./dev.js"
 const Config = await initConfig()
 
 switch (process.argv[2]) {
@@ -39,18 +40,17 @@ switch (process.argv[2]) {
       Config.vuesfcbuilder.isDev = true
       compiler(true,Config.vuesfcbuilder,()=>{
         consola.log(sysColor('Initilize server...'))
-        run(Config,true)
+        runDev(Config)
       })
     }else{
       consola.log(sysColor('Initilize server...'))
-      run(Config,true)
+      runDev(Config)
     }
     break;
   default:
     consola.error("unkown command")
     break;
 }
-
 
 function sysColor(msg){
   return chalk.green('☕️ '+msg)

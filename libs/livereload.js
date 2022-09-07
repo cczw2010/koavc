@@ -24,6 +24,7 @@ export function startLiveServer(server){
     //   console.debug('client close', ws.pageUUID );
     // })
   })
+  return wsServer
 }
 // 页面注入客户端代码
 export function injectCode(pagePath){
@@ -45,10 +46,14 @@ export function injectCode(pagePath){
     __connectLock = true
     __ws_liveload = new __webSocket('ws://${address.address}:${address.port}');
     __ws_liveload.onopen=function() {
-      console.debug("> livereload actived!")
-      __connectLock = false
-      __reConnectCount = 0;
-      __ws_liveload.send('${CLIENTMSGTYPE.connect}::'+__livereload_uuid);
+      // 重连成功，刷新
+      if(__reConnectCount>0){
+        console.debug("> livereload server actived,restart!")
+        window.location.reload()
+      }else{
+        console.debug("> livereload actived!")
+        __ws_liveload.send('${CLIENTMSGTYPE.connect}::'+__livereload_uuid);
+      }
     };
     __ws_liveload.onmessage=function(event) {
       console.debug('received: %s', event.data);
