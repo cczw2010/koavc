@@ -3,6 +3,7 @@ import chokidar  from "chokidar"
 import {getRuntimeConfig} from "../index.js"
 
 let workProcess = null
+let scriptPath = null
 // ctrl+c
 process.on("SIGINT", function(code){
   if(workProcess){
@@ -11,17 +12,18 @@ process.on("SIGINT", function(code){
   process.exit(1);
 })
 
+
 // 启动服务进程，如果存在会自动先干掉
 export default function(){
   const scriptFile = process.env.NODE_ENV === 'production'?'../scripts/start.js':'../scripts/dev.js'
-  const scriptPath = new URL(scriptFile,import.meta.url).pathname
-  runWorkProcess(scriptPath)
+  scriptPath = new URL(scriptFile,import.meta.url).pathname
+  runWorkProcess()
   if(process.env.NODE_ENV!=='production'){
     watcher()
   }
 }
 // 启动server 进程
-function runWorkProcess(scriptPath){
+function runWorkProcess(){
   if(workProcess){
     workProcess.kill()
   }
