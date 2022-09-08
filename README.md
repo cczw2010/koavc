@@ -9,11 +9,15 @@ npm install koavc --save
 
 ### 运行服务
 ```
-#启动服务,如果是vue模式，必须先执行build命令
-npx koavc start
 #编译vue文件
 npx koavc build
-# 开发模式.1.3.0开始支持简单的liveload
+
+#生产模式启动服务,如果是vue模式，必须先执行build命令
+npx koavc start
+
+# 开发模式,暂不支持hmr
+# v1.3.0开始支持简单的livereload,
+# v1.3.4开始支持服务器端livereload
 npx koavc dev
 ```
 
@@ -79,26 +83,18 @@ router:{
 ...
 ```
 
-### 中间件配置
+### 中间件
 
-在`koavc.config.js`中可配置koa(`middlewares`)或者路由的全局中间件(`router.middlewares`)，或者在`controller路由文件`中配置的中间件只在当前路由中生效，中间件支持两种`本地中间件`和`第三方中间件`。本地中间件文件要求返回一个默认的初始化函数，用于加载配置文件初始化并返回最终中间件函数。 支持[async function]。配置方法如下：
+中间件支持两种`本地中间件`和`第三方中间件`。本地自定义的中间件文件要求返回一个默认的初始化函数，用于加载配置文件初始化并返回真正的中间件函数。（v1.3.4开始支持返回中间件方法数组，方便整合依赖第三方中间件，更加灵活） 支持[async function]。 
 
-```javascript
-import etag from "koa-etag"
-...
-middlewares:[
-'~/middlewares/upload.js',              //1 本地引入以~开头表示项目根目录,【注意】！本地中间件文件返回一个默认的初始化方法，方法执行后返回中间件方法
-['~/middlewares/auth.js',{...options}]  //2 数组格式的话，第二个值代表传入的参数
-etag(),                                 //3 直接传入第三方中间件
-]
-...
-```
+主要应用场景为`koa中间件`和`路由中间件`，下面分别说明。
 
-### KOA中间件
+
+#### > KOA中间件
 
 用于koa的中间件，对应配置文件中的`middlewares`，在router初始化之前加载
 
-### 路由中间件
+#### > 路由中间件
 
 路由中间件可以有两种调用方式，
 
@@ -119,14 +115,32 @@ export default {
 ##------- middleware => auth.js
 ...
 <!-- 路由中间件中获取controller扩展参数，注意该方法只会取匹配的路由中最后一个的对应扩展参数，所以要注意路由匹配重叠 -->
-if(ctx.getControllerExtParam("auth")===false){   //false
-  return next()
-}else{
-  ctx.body="not login"
+return (ctx,next)=>{
+  if(ctx.getControllerExtParam("auth")===false){   //false
+    return next()
+  }else{
+    ctx.body="not login"
+  }
 }
 ...
 
 
+```
+
+
+#### > 中间件配置
+
+不管在那种场景下，中间件的配置文件都为数组格式，具体如下：
+
+```javascript
+import etag from "koa-etag"
+...
+middlewares:[
+'~/middlewares/upload.js',              //1 本地引入以~开头表示项目根目录,【注意】！本地中间件文件返回一个默认的初始化方法，方法执行后返回中间件方法
+['~/middlewares/auth.js',{...options}]  //2 数组格式的话，第二个值代表传入的参数
+etag(),                                 //3 直接传入第三方中间件
+]
+...
 ```
 
 
