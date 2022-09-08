@@ -43,7 +43,6 @@ async function loadMiddleware(middlewareOption){
     middlewarePath = middlewareOption[0]
     option = middlewareOption[1]
   }
-
   middlewarePath = middlewarePath.replace(/^~/ig,process.env.PWD)
   const {default:middlewareInit,param} = await import(middlewarePath).then(module=>module)
 

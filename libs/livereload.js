@@ -3,6 +3,7 @@ import hash from "hash-sum"
 import { WebSocketServer } from  'ws'
 
 let wsServer = null
+let watcher = null
 // 消息类型
 const CLIENTMSGTYPE = {
   connect:'conncted',
@@ -25,6 +26,36 @@ export function startLiveServer(server){
     // })
   })
   return wsServer
+}
+// 初始化文件监控
+export function  initViewWatcher(watchpath,option,onChange){
+  option = Object.assign({
+    // ignored: /(^|[\/\\])\..$/, // ignore dotfiles
+    persistent: true,
+    // cwd:'.',
+    // alwaysStat: true,
+    interval: 1000,   //过早触发可能会文件未写完
+    // awaitWriteFinish: {
+    //   stabilityThreshold: 200,
+    //   pollInterval: 100
+    // },
+  },option)
+  watcher = chokidar.watch([].concat(watchpath),option)
+  watcher.on('ready', () => {
+    // console.debug("livereload server start...",watcher.getWatched())
+    watcher.on('change', (filepath,fstats)=>{
+      filepath = onChange(filepath,fstats)
+      if(filepath){
+        reloadPage(filepath)
+      }
+    })
+  })
+}
+// 增加监控文件 或者文件数组
+export function addWatchFile(files){
+  if(watcher && files){
+    watcher.add(files)
+  }
 }
 // 页面注入客户端代码
 export function injectCode(pagePath){
@@ -90,31 +121,7 @@ export function reloadPage(pagePath){
     }
   });
 }
-// 初始化文件监控
-export function  initWatcher(watchpath,option,onChange){
-  option = Object.assign({
-    // ignored: /(^|[\/\\])\..$/, // ignore dotfiles
-    persistent: true,
-    // cwd:'.',
-    // alwaysStat: true,
-    interval: 1000,   //过早触发可能会文件未写完
-    // awaitWriteFinish: {
-    //   stabilityThreshold: 200,
-    //   pollInterval: 100
-    // },
-  },option)
-  const watcher = chokidar.watch([].concat(watchpath),option)
-  watcher.on('ready', () => {
-    // console.debug("livereload server start...",watcher.getWatched())
-    watcher.on('change', (filepath,fstats)=>{
-      filepath = onChange(filepath,fstats)
-      // console.log('changer1.....',filepath)
-      if(filepath){
-        reloadPage(filepath)
-      }
-    })
-  })
-}
+
 
 function getPageUUid(pagePath){
   return hash(pagePath)

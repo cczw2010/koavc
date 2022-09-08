@@ -1,13 +1,13 @@
 import {join,resolve} from "path"
 import {readFile} from "fs/promises"
-import { initWatcher,injectCode } from "../../libs/livereload.js"
+import { initViewWatcher,injectCode } from "../../libs/livereload.js"
 import ViewCache from '../../libs/viewcache.js'
 
-export default async (options,isDev)=>{
+export default async (options)=>{
   options = options||{}
   options.src = options.src||'view'
   const engine = options.engine||'default'
-
+  const isDev = process.env.NODE_ENV !== 'production'
   const renderEngine = (await import(`./${engine}.js`)).default
   // 如果有初始化方法则初始化
   if('init' in renderEngine){
@@ -24,7 +24,7 @@ export default async (options,isDev)=>{
       // 使用全路径，防止不统一
       return join(process.env.PWD,filePath)
     }
-    initWatcher(watches,{},onChange)
+    initViewWatcher(watches,{},onChange)
   }
   //  view方法
   return async function(filePath,data){

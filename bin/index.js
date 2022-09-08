@@ -4,10 +4,11 @@ import consola from "consola"
 import chalk from "chalk"
 import {join} from "path"
 import {compiler,rootDist} from "vuesfcbuilder"
-import {run,initConfig} from "../index.js"
-import runDev from "./dev.js"
-const Config = await initConfig()
+import runServer from "./run.js"
+import { getRuntimeConfig } from "../index.js"
+// import build from "../scripts/build.js"
 
+const Config = await getRuntimeConfig()
 switch (process.argv[2]) {
   case "build":
     if(Config.view.engine=="vue"){
@@ -17,8 +18,10 @@ switch (process.argv[2]) {
     }else{
       consola.warn('View complier engine is not [vue], ignore vue complier! ')
     } 
+    // build()
     break;
   case "start":
+    process.env.NODE_ENV = 'production'
     consola.log(`> koavc run with [${chalk.yellow('production')}] mode`)
     if(Config.view.engine=="vue"){
       const vuebuilderConfig = await import(join(rootDist,'config.runtime.js'))
@@ -30,21 +33,22 @@ switch (process.argv[2]) {
       }
     }
     consola.log(sysColor('Initilize server...'))
-    run(Config)
+    runServer()
     break;
   case "dev":
   case undefined:
+    process.env.NODE_ENV = 'development'
     consola.log(`> koavc run with [${chalk.yellow('development')}] mode ♻️`)
     if(Config.view.engine=="vue"){
       consola.log(sysColor('vue builder start...'))
       Config.vuesfcbuilder.isDev = true
       compiler(true,Config.vuesfcbuilder,()=>{
         consola.log(sysColor('Initilize server...'))
-        runDev(Config)
+        runServer()
       })
     }else{
       consola.log(sysColor('Initilize server...'))
-      runDev(Config)
+      runServer()
     }
     break;
   default:
@@ -55,3 +59,4 @@ switch (process.argv[2]) {
 function sysColor(msg){
   return chalk.green('☕️ '+msg)
 }
+
