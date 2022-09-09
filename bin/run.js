@@ -1,6 +1,7 @@
 import spawn from "cross-spawn"
 import chokidar  from "chokidar"
 import {getRuntimeConfig} from "../index.js"
+import { resolve } from "path"
 
 let workProcess = null
 let scriptPath = null
@@ -43,9 +44,8 @@ function runWorkProcess(){
 // 监控器 用于开发模式，文件变化会重启server进程
 async function watcher(){
   const config = await getRuntimeConfig()
-  console.log(config)
   // 启动简单的配置文件监控文件变化，然后服务restart
-  let watchPaths = ['./koavc.config.js']
+  let watchPaths = [resolve('./koavc.config.js')]
   // global middlewares
   config.middlewares.map((v)=>{
     let filepath = getLocalMiddlewarePath(v)
@@ -53,7 +53,7 @@ async function watcher(){
   })
   // apps
   config.app.map(appconfig=>{
-    watchPaths.push(appconfig.dir)
+    watchPaths.push(resolve(appconfig.dir))
     // app  middlewares
     appconfig.middlewares.map((v)=>{
       let filepath = getLocalMiddlewarePath(v)
@@ -87,7 +87,7 @@ function getLocalMiddlewarePath(middleware){
   }
   if(filepath && filepath.startsWith('~')){
     // watchPaths.push(filepath.replace(/^~/,process.env.PWD))
-    return filepath.replace(/^~/,'.')
+    return resolve(filepath.replace(/^~/,'.'))
   }
   return null
 }

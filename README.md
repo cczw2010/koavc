@@ -27,22 +27,22 @@ npx koavc dev
 
 #### > 应用配置
 
-可在`koavc.config.js`中修改。如果不传入配置，默认配置如下：
+可在`koavc.config.js`中修改。你最少应该配置一个应用，配置如下：
 
 ```
 ...
 app:[
 {
-  // 应用根目录，默认:app
+  // * 应用根目录，只有这个参数是必须的
   dir:"app",
-  // 应用访问的路由前缀，可以区分应用,默认空,eg：/admin
-  prefix:'/',
-  // 路由对应的host,匹配的才生效，可选
+  // 应用访问的路由前缀，可以区分应用,默认空, eg：/admin
+  prefix:'',
+  // 路由对应的host,匹配的才生效,默认空
   host:'',
-  // router的allowedMethods配置
+  // router的allowedMethods配置，默认空
   allowedMethods:{},
-  // 公用路由中间件,这里的中间件可以访问router
-  middlewares:['../middlewares/injectController.js'],
+  // 公用路由中间件,这里的中间件可以访问router，,默认空
+  middlewares:['~/middlewares/auth.js'],
 }
 ...
 ]
@@ -128,7 +128,7 @@ export default {
 
 ##------- middleware => auth.js
 ...
-<!-- 路由中间件中获取路由文件的扩展参数，注意该方法只会取匹配的路由中最后一个的对应扩展参数，所以要注意路由匹配重叠 -->
+<!-- 路由中间件中获取路由文件的扩展参数，注意该方法只会取匹配的路由中第一个的对应扩展参数，所以要注意路由匹配重叠 -->
 return (ctx,next)=>{
   if(ctx.getRouteExtParam("auth")===false){   //false
     return next()
@@ -267,7 +267,7 @@ ctx.alias.list()
 根据配置的渲染引擎，加载渲染模板
 
 #### context.getRouteExtParam(paramName)  :v1.3.3
-用于router的中间件中，可以获取最后一个匹配的router对应的controller的自定义扩展属性
+用于router的中间件中，可以获取第一个匹配的router对应的controller的自定义扩展属性
 
 ###▌ DEMO
 

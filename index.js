@@ -6,6 +6,9 @@ import consola from "consola"
 import chalk from "chalk"
 import initApp from "./core/app.js"
 import defConfig from "./koavc.config.js"
+process.on("uncaughtException",(e)=>{
+  consola.error(e)
+})
 // 启动生产web服务
 export async function run(callback){
   const config = await getRuntimeConfig()
@@ -50,5 +53,26 @@ export async function getRuntimeConfig(){
   if(!localConfig){
     consola.warn('ignore local config file [koavc.config.js], use default.')
   }
-  return deepmerge(defConfig,localConfig)
+  const config = deepmerge(defConfig,localConfig)
+  config.app = initAppOptions(config.app)
+  return config
+}
+
+
+// 初始化多应用的配置参数
+function initAppOptions(options){
+  if(!options || options.length==0){
+    throw new Error("There should be at least one app in [koavc.config.js]")
+
+  }
+  options.map((option,id)=>{
+    if(!option.dir){
+      throw new Error(`The ${id}th app option [dir] is required in [koavc.config.js]`)
+    }
+    option.dir = resolve(option.dir)
+    // if(!option.prefix){
+    //   option.prefix = '/'
+    // }
+  })
+  return options
 }

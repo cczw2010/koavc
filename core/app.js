@@ -16,7 +16,7 @@ export default async function(config){
   })
   app.context.Config = config
   app.context.logger =logger
-  // 初始化静态服务，放上面,下面的中间件就不会相应静态服务的内容了
+  // 初始化静态服务，放上面,下面的中间件就不会响应静态服务的内容了
   if(config.statics){
     for(const staticInfo of config.statics){
       app.use(mount(staticInfo[0],staticServe(staticInfo[1])),{defer:true})
@@ -35,8 +35,8 @@ export default async function(config){
   // 初始化view
   app.context.view = await viewer(config.view)
   // 初始化多应用
-  const routes = await loadControllers(config.app,logger)
-  app.use(routes)
+  const router = await loadControllers(config.app,logger)
+  app.use(router.routes())
   return app
 }
 

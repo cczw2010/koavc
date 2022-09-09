@@ -5,8 +5,8 @@ const extKeyName = "_extparams"
  **/
 export default function(){
   return (ctx,next)=>{
-    ctx.getControllerExtParam = function(paramName){
-      return getControllerExtParam(this,paramName)
+    ctx.getRouteExtParam = function(paramName){
+      return getRouteExtParam(this,paramName)
     }
     return next()
   }
@@ -19,12 +19,15 @@ export function setRouteExtParams(routerLayer,extparams){
   routerLayer[extKeyName] = extparams
 }
 /**
- *  只有进入router中有效,只最后一个匹配的router，
+ *  只有进入router中有效,只第一个匹配的router，
  */
 function getRouteExtParam(ctx,paramName){
   if(ctx.router && ctx.matched && ctx.matched.length>1){
-    const routerLayer = ctx.matched[ctx.matched.length-1]
-    return routerLayer[extKeyName][paramName]
+    // console.log( ctx.matched)
+    const routerLayer = ctx.matched.find(layer=>layer.opts.end)
+    if(routerLayer&&routerLayer[extKeyName]){
+      return routerLayer[extKeyName][paramName]
+    }
   }
   return null
 }
