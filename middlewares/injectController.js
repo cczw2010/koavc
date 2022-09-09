@@ -15,13 +15,13 @@ export default function(){
 /**
  * 设置某个route实体的扩展参数，routerLayer为stack中的layer
  */
-export function setControllerExtParams(routerLayer,extparams){
+export function setRouteExtParams(routerLayer,extparams){
   routerLayer[extKeyName] = extparams
 }
 /**
  *  只有进入router中有效,只最后一个匹配的router，
  */
-function getControllerExtParam(ctx,paramName){
+function getRouteExtParam(ctx,paramName){
   if(ctx.router && ctx.matched && ctx.matched.length>1){
     const routerLayer = ctx.matched[ctx.matched.length-1]
     return routerLayer[extKeyName][paramName]

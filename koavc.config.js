@@ -9,23 +9,10 @@ export default {
   //   key: fs.readFileSync('ssl/xxxxyun.com.key'),
   //   cert: fs.readFileSync('ssl/xxxxyun.com.pem'),
   // },
-  //============路由配置
-  router:{
-    // controller文件根目录
-    dir:"controller",
-    // @koa/router中间件的配置
-    option:{
-      // host:'',
-      // prefix:'',
-      // V1.3.3 不建议修改，否则全局路由中间件将失效
-      exclusive:false,
-    },
-    // v1.3.4 router的allowedMethods配置
-    allowedMethods:{},
-    // V1.3.3 新增， 全局路由中间件,这里的中间件可以访问router, 前提是 option的 exclusive:false
-    middlewares:['../middlewares/injectController.js']
-  },
-  // alias:{},
+  //============应用配置
+  // v1.4.0开始，配置与之前版本不通用！更改为多应用配置模式，选项也有变化，老的版本参考对应版本的readme.md
+  app:[],
+  alias:{},
   //============日志
   logger:{
     tag:"koavc",      // tag标签

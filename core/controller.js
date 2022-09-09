@@ -5,34 +5,50 @@ import {relative,join} from "path"
 import { readdir,stat } from 'fs/promises'
 import Router from '@koa/router'
 import {middlewaresLoader} from "./middleware.js"
-import {setControllerExtParams} from "../middlewares/injectController.js"
+import {setRouteExtParams} from "../middlewares/injectController.js"
+import deepmerge from "deepmerge"
 // controller固定的属性
 const constants = ['name','alias','middlewares','fn','method']
-
-let RootDir = null
-let Logger = null
-export default async (config,logger)=>{
-  RootDir = config.dir,
-  Logger = logger||console
-  const router = new Router(config.option)
-  // exclusive为false 注入全局route支持
-  if(!config.option.exclusive){
-    Logger.info("loading router global middlewares...")
-    const middlewares = await middlewaresLoader(config.middlewares).catch(e=>{
-      Logger.error(e)
-      process.exit(0)
-    })
-    router.use(middlewares)
-  }else{
-    Logger.warn("router global middlewares support is closed.")
+// 默认应用配置
+export const defAppConfig = {
+    dir:"app",
+    prefix:'/',
+    host:'',
+    allowedMethods:{},
+    middlewares:['../middlewares/injectController.js']
   }
+
+let Logger = null
+export default async (configs,logger)=>{
+  Logger = logger||console
+  if(configs.length==0){
+    configs.push(defAppConfig)
+  } 
+  const router = new Router()
+  for (const config of configs) {
+    await initAppRouter(config,router)
+  }
+  return router.routes()
+}
+// 初始化一个应用路由
+async function initAppRouter(config,baseRouter){
+  config = deepmerge(defAppConfig,config)
+  const {dir,prefix,host,middlewares,allowedMethods} = config
+  // exclusive为false 注入全局route支持 , prefix 后面拆分路由再用
+  const router = new Router({host,exclusive:false})
+  Logger.info("loading router global middlewares...")
+  const appMiddlewares = await middlewaresLoader(middlewares).catch(e=>{
+    Logger.error(e)
+    process.exit(0)
+  })
+  router.use(appMiddlewares)
   Logger.info("loading router controllers...")  
-  await travel(RootDir,router)
-  return router
+  await travel(dir,router,dir)
+  baseRouter.use(prefix,router.routes(),router.allowedMethods(allowedMethods))
 }
 
 // 遍历加载controller
-async function travel(dir,router) {
+async function travel(dir,router,appBaseDir) {
   const files =await readdir(dir).catch(e=>{
     Logger.error(e)
     return []
@@ -62,8 +78,12 @@ async function travel(dir,router) {
       }
       //2 route path & alias
       const paths = []
-      const route = relative(RootDir,pathname).replace(/\.js$/i,'').replace(/\/_/g,'\/:')
+      const route = relative(appBaseDir,pathname).replace(/\.js$/i,'').replace(/\/_/g,'\/:')
       paths.push(join('/',route))
+      // index.js  简写支持
+      if(file.toLowerCase()=='index.js'){
+        paths.push(join('/',dir))
+      }
       if(m.alias){
         paths.push(m.alias)
       }
@@ -88,7 +108,7 @@ async function travel(dir,router) {
             extparams[key] = m[key]
           }
         }
-        setControllerExtParams(result.stack[result.stack.length-1],extparams)
+        setRouteExtParams(result.stack[result.stack.length-1],extparams)
       }
     }
   }

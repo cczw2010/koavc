@@ -48,7 +48,7 @@ export async function getRuntimeConfig(){
     process.exit(1)
   })
   if(!localConfig){
-  consola.warn('ignore local config file [koavc.config.js], use default.')
+    consola.warn('ignore local config file [koavc.config.js], use default.')
   }
   return deepmerge(defConfig,localConfig)
 }

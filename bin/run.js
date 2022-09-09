@@ -43,20 +43,22 @@ function runWorkProcess(){
 // 监控器 用于开发模式，文件变化会重启server进程
 async function watcher(){
   const config = await getRuntimeConfig()
+  console.log(config)
   // 启动简单的配置文件监控文件变化，然后服务restart
-  let watchPaths = ['./koavc.config.js',config.router.dir]
-  // global middlewares && router globalwares
-  config.middlewares.concat(config.router.middlewares).map((v)=>{
-    let filepath = null
-    if(Array.isArray(v)){
-      filepath = v[0]
-    }else if(typeof v == 'string'){
-      filepath = v
-    }
-    if(filepath && filepath.startsWith('~')){
-      // watchPaths.push(filepath.replace(/^~/,process.env.PWD))
-      watchPaths.push(filepath.replace(/^~/,'.'))
-    }
+  let watchPaths = ['./koavc.config.js']
+  // global middlewares
+  config.middlewares.map((v)=>{
+    let filepath = getLocalMiddlewarePath(v)
+    filepath && watchPaths.push(filepath)
+  })
+  // apps
+  config.app.map(appconfig=>{
+    watchPaths.push(appconfig.dir)
+    // app  middlewares
+    appconfig.middlewares.map((v)=>{
+      let filepath = getLocalMiddlewarePath(v)
+      filepath && watchPaths.push(filepath)
+    })
   })
   // console.log("watchPath",watchPaths)
   const watcher = chokidar.watch(watchPaths, {
@@ -74,4 +76,18 @@ async function watcher(){
       runWorkProcess()
     })
   })
+}
+// 判断设置的中间件是否本地中间件，是的话返回路径，不是返回null
+function getLocalMiddlewarePath(middleware){
+  let filepath = null
+  if(Array.isArray(middleware)){
+    filepath = middleware[0]
+  }else if(typeof middleware == 'string'){
+    filepath = middleware
+  }
+  if(filepath && filepath.startsWith('~')){
+    // watchPaths.push(filepath.replace(/^~/,process.env.PWD))
+    return filepath.replace(/^~/,'.')
+  }
+  return null
 }

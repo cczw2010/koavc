@@ -1,13 +1,15 @@
-### 安装依赖库
+**!!! V1.4.0版本变动比较大，更改为多应用配置模式，与之前版本不兼容，之前的版本请查看之前版本的README.md**
+
+###▌ 安装依赖库
 ```
 npm install koavc --save
 ```
-### 初始化服务器配置
+###▌ 初始化服务器配置
 
 通过配置 `koavc.config.js` 来配置服务器相关配置,具体查看配置文件。
 
 
-### 运行服务
+###▌ 运行服务
 ```
 #编译vue文件
 npx koavc build
@@ -15,24 +17,50 @@ npx koavc build
 #生产模式启动服务,如果是vue模式，必须先执行build命令
 npx koavc start
 
-# 开发模式,暂不支持hmr
-# v1.3.0开始支持简单的livereload,
-# v1.3.4开始支持服务器端livereload
+# 开发模式,暂不支持hmr，支持livereload
 npx koavc dev
 ```
 
-### controller  路由
-路由控制器目录，内部基于[`@koa/router`](https://github.com/koajs/router)中间件实现，目录会自动加载，目录结构与url结构等同。 
+###▌ 应用（路由组 | controller组）
 
-路径或文件名以`_`开头代表`泛路由`，代表`@koa/router`路由中的 `:param`。参数可以通过`ctx.params`访问
+`v1.4.0`开始变更为多应用模式，应用由一组路由文件组成，路由控制器目录，内部基于[`koa-router`](https://github.com/ZijianHe/koa-router)中间件实现。
+
+#### > 应用配置
+
+可在`koavc.config.js`中修改。如果不传入配置，默认配置如下：
+
+```
+...
+app:[
+{
+  // 应用根目录，默认:app
+  dir:"app",
+  // 应用访问的路由前缀，可以区分应用,默认空,eg：/admin
+  prefix:'/',
+  // 路由对应的host,匹配的才生效，可选
+  host:'',
+  // router的allowedMethods配置
+  allowedMethods:{},
+  // 公用路由中间件,这里的中间件可以访问router
+  middlewares:['../middlewares/injectController.js'],
+}
+...
+]
+```
+
+出于系统及公共路由中间件设计，系统默认所有匹配的路由都会执行，[_]开头的路由文件在最前面先执行。具体原因可查看`koa-router`的`exclusive `配置
+
+#### > 应用目录
+
+应用目录下的路由文件会自动加载，目录结构与url结构匹配。 路径或文件名以`_`开头代表`泛路由`，代表`koa-router`路由中的 `:param`。参数可以通过`ctx.params`访问
 
 ```
 //====url: 
 /apis/user/index
 /apis/user/1  
 /apis/client/1
-//====目录
-controller
+//====默认应用目录
+app
 ---apis
 ------_cate
 ---------_id.js   目标路由文件   math:  /apis/client/1
@@ -42,11 +70,13 @@ controller
 
 ```
 
-`路由文件` 就是每个controller下的每个js文件， 是提供给`@koa/router`使用的，格式如下:
+#### > 路由文件
+
+每个应用目录下的js文件就是对应的路由文件， 是提供给`koa-router`使用的，格式如下:
 
 ```
 export default {
-    // 路由命名,参见`@koa/router`的说明，可选
+    // 路由命名,参见`koa-router`的说明，可选
     name:'',
     // 单独设定固定seo别名，不要为泛域名添加该选项，可选
     alias:'user-upload',
@@ -62,30 +92,14 @@ export default {
 }
 ```
 
-`路由配置`,可在`koavc.config.js`中修改,默认配置如下：
 
-```
-...
-router:{
-  <!-- controller文件根目录 -->
-  dir:"controller",
-  <!-- @koa/router中间件的配置 -->
-  option:{
-    ...
-    // 是否只执行最后一个匹配的，默认全部匹配的都回执行。[_]开头的controller在前面先执行
-    exclusive:false, //默认,不建议修改
-  }
-  // V1.3.3 全局路由中间件,这里的中间件可以访问router，前提是 option的 exclusive:false
-  middlewares:[],
-  // v1.3.4 router的allowedMethods配置
-  allowedMethods:{},
-},
-...
-```
+###▌ 中间件
 
-### 中间件
+中间件支持两种`本地中间件`和`第三方中间件`。
 
-中间件支持两种`本地中间件`和`第三方中间件`。本地自定义的中间件文件要求返回一个默认的初始化函数，用于加载配置文件初始化并返回真正的中间件函数。（v1.3.4开始支持返回中间件方法数组，方便整合依赖第三方中间件，更加灵活） 支持[async function]。 
+本地自定义的中间件文件要求返回一个默认的初始化函数， 支持[async function]。用于加载配置文件初始化，该初始化函数返回真正的中间件函数
+
+初始化函数支持返回中间件方法数组，方便整合依赖第三方中间件，更加灵活，具体可查看demo中的auth中间件。 
 
 主要应用场景为`koa中间件`和`路由中间件`，下面分别说明。
 
@@ -94,29 +108,29 @@ router:{
 
 用于koa的中间件，对应配置文件中的`middlewares`，在router初始化之前加载
 
-#### > 路由中间件
+#### > 应用 | 路由中间件
 
 路由中间件可以有两种调用方式，
 
-* 一种在controller中针对某个路由设置中间件（具体查看controller文件介绍）， 
+* 一种在路由文件中针对某个路由设置中间件（具体查看路由文件介绍）， 
 
-* 一种是V1.3.3 新增，的针对路由全局的中间件，对应配置文件中的`router.middlewares`。注意出于设计考虑，**前提是router配置中的router.option.exclusive 为false（默认）** 才会生效。下面详细介绍一下：
+* 一种是针对应用公共的中间件。
 
-这里的中间件可以访问router，且在controller方法执行之前加载，并新增了`controller` 扩展属性功能，可以方便的对controller进行预处理及个性化操作。eg：
+应用的中间件配置之所以和全局分开，是因为有特殊的功能，中间件在路由文件方法执行之前加载，可以访问`router`对象，且为路由文件新增了扩展属性支持`getRouteExtParam`，可以方便的对访问进行预处理及个性化操作。eg：
 
 ```javascript
-##------- controller => home.js
+##------- controller（路由文件） => home.js
 export default {
   method:'get',
-  auth:false,         //扩展参数
+  auth:false,         //自定义扩展参数
   fn:(ctx,next)=>{}
 }
 
 ##------- middleware => auth.js
 ...
-<!-- 路由中间件中获取controller扩展参数，注意该方法只会取匹配的路由中最后一个的对应扩展参数，所以要注意路由匹配重叠 -->
+<!-- 路由中间件中获取路由文件的扩展参数，注意该方法只会取匹配的路由中最后一个的对应扩展参数，所以要注意路由匹配重叠 -->
 return (ctx,next)=>{
-  if(ctx.getControllerExtParam("auth")===false){   //false
+  if(ctx.getRouteExtParam("auth")===false){   //false
     return next()
   }else{
     ctx.body="not login"
@@ -144,7 +158,7 @@ etag(),                                 //3 直接传入第三方中间件
 ```
 
 
-### alias
+###▌ alias
 
 为了支持seo,内置实现了个简单的 `alias`中间件最为路由映射使用，如果想加载只需增加响应配置即可，也提供了api可以动态更新路由映射，具体参考API部分
 
@@ -161,10 +175,10 @@ alias: {
 }
 ```
 
-### view
+###▌ view
 服务端渲染视图模板根目录，支持多种渲染模式，可在配置文件`koavc.config.js`中的`view`对象来设置。  
 
-1、**在controller路由文件使用 `ctx.view` 方法来渲染模板文件**
+1、**在路由文件使用 `ctx.view` 方法来渲染模板文件**
 
 ```javascript
 /**
@@ -218,7 +232,7 @@ statics:[
 ```
 
 
-### API
+###▌ API
 
 api都注入到了`context`上
 
@@ -252,9 +266,9 @@ ctx.alias.list()
 #### context.view(tplPath,data)
 根据配置的渲染引擎，加载渲染模板
 
-#### context.getControllerExtParam(paramName)  :v1.3.3
+#### context.getRouteExtParam(paramName)  :v1.3.3
 用于router的中间件中，可以获取最后一个匹配的router对应的controller的自定义扩展属性
 
-### DEMO
+###▌ DEMO
 
 查看[这里](https://github.com/cczw2010/koavc-example)

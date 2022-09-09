@@ -1,4 +1,3 @@
-import { resolve} from 'path'
 import Koa from "koa"
 import staticServe from "koa-static"
 import mount from "koa-mount"
@@ -35,11 +34,9 @@ export default async function(config){
   })
   // 初始化view
   app.context.view = await viewer(config.view)
-  // 初始化controller
-  config.router.dir = resolve(config.router.dir)
-  const router = await loadControllers(config.router,logger)
-  app.use(router.routes())
-  app.use(router.allowedMethods(config.router.allowedMethods))
+  // 初始化多应用
+  const routes = await loadControllers(config.app,logger)
+  app.use(routes)
   return app
 }
 
