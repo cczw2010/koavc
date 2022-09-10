@@ -9,7 +9,6 @@ import defConfig from "./koavc.config.js"
 
 process.on("uncaughtException",(e)=>{
   consola.error(e)
-  process.exit(1)
 })
 // process.on("unhandledRejection",(e)=>{
 //   consola.error(e)
