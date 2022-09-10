@@ -7,12 +7,14 @@ let workProcess = null
 let scriptPath = null
 // ctrl+c
 process.on("SIGINT", function(code){
+  process.exit(1);
+})
+// 主进程退出，子进程也退出
+process.on("exit", function(code){
   if(workProcess){
     workProcess.kill()
   }
-  process.exit(1);
 })
-
 
 // 启动服务进程，如果存在会自动先干掉
 export default function(){
@@ -39,6 +41,12 @@ function runWorkProcess(){
       stdio: "inherit"
     }
   )
+  workProcess.on("exit",(code)=>{
+    // code非0 代表子进程非正常退出，主进程一起退出 
+    if(code>0){
+      process.exit(1)
+    }
+  })
   // console.log("workProcess running.... ",workProcess.pid)
 }
 // 监控器 用于开发模式，文件变化会重启server进程

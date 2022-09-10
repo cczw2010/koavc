@@ -14,7 +14,7 @@
   // 加载所有的全局配置中间件
   options = options||[]
   for (const item of options) {
-    let middlewares = await loadMiddleware(item)
+    const middlewares = await loadMiddleware(item)
     if(!middlewares || middlewares.length==0){
       throw new Error(`ignored invalid middleware [${item}]`)
     }
@@ -44,14 +44,14 @@ async function loadMiddleware(middlewareOption){
     option = middlewareOption[1]
   }
   middlewarePath = middlewarePath.replace(/^~/ig,process.env.PWD)
-  const {default:middlewareInit,param} = await import(middlewarePath).then(module=>module)
+  const middlewareInit = await import(middlewarePath).then(m=>m.default)
 
   // 执行初始化方法返回中间件，v1.3.4支持返回多个中间件数组,方便集成其他中间件
-  let middlewares = null
-  if(middlewareInit instanceof Promise){
+  let middlewares = []
+  if(middlewareInit instanceof Promise || Object.prototype.toString.call(middlewareInit)=='[object AsyncFunction]'){
     middlewares = await middlewareInit(option)
   }else if(middlewareInit instanceof Function){
     middlewares = middlewareInit(option)
   }
-  return middlewares
+  return [].concat(middlewares)
 }

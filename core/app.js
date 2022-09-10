@@ -12,7 +12,7 @@ export default async function(config){
   const app = new Koa()
   const logger =  createLogger(config.logger)
   app.on('error', (err, ctx) => {
-    logger.error( err)
+    logger.error(err)
   })
   app.context.Config = config
   app.context.logger =logger
@@ -28,10 +28,7 @@ export default async function(config){
     app.use(await alias(config.alias,logger))
   }
   // 加载全局中间件
-  await middlewaresLoader(config.middlewares,app,logger).catch(e=>{
-    logger.error(e)
-    process.exit(0)
-  })
+  await middlewaresLoader(config.middlewares,app,logger)
   // 初始化view
   app.context.view = await viewer(config.view)
   // 初始化多应用

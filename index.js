@@ -6,9 +6,14 @@ import consola from "consola"
 import chalk from "chalk"
 import initApp from "./core/app.js"
 import defConfig from "./koavc.config.js"
+
 process.on("uncaughtException",(e)=>{
   consola.error(e)
+  process.exit(1)
 })
+// process.on("unhandledRejection",(e)=>{
+//   consola.error(e)
+// })
 // 启动生产web服务
 export async function run(callback){
   const config = await getRuntimeConfig()
