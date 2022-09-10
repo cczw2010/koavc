@@ -55,11 +55,11 @@ async function travel(dir,router,appBaseDir) {
     } else if(pathname.endsWith('.js')){
       let m = await import(pathname).then(module=>module.default).catch(e=>{
         Logger.error(pathname,e)
+        // Logger.warn(`Invalid route controller [${pathname}]`)
         return false
       })
       if(!m){
-        Logger.warn(`ignored invalid route controller [${pathname}]`)
-        return
+        return false
       }
       const params = []
       //1 route name
@@ -68,12 +68,14 @@ async function travel(dir,router,appBaseDir) {
       }
       //2 route path & alias
       const paths = []
+      // 2.1index.js  简写支持
+      if(file.toLowerCase()=='index.js'){
+        paths.push(join('/',relative(appBaseDir,dir)))
+      }
+      // 2.2
       const route = relative(appBaseDir,pathname).replace(/\.js$/i,'').replace(/\/_/g,'\/:')
       paths.push(join('/',route))
-      // index.js  简写支持
-      // if(file.toLowerCase()=='index.js'){
-      //   paths.push(join('/',dir))
-      // }
+      // 2.3 alias
       if(m.alias){
         paths.push(m.alias)
       }

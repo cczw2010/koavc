@@ -23,7 +23,7 @@ npx koavc dev
 
 ###▌ 应用（路由组 | controller组）
 
-`v1.4.0`开始变更为多应用模式，应用由一组路由文件组成，路由控制器目录，内部基于[`koa-router`](https://github.com/ZijianHe/koa-router)中间件实现。
+`v1.4.0`开始变更为多应用模式，应用由设定的目录下的一组路由文件组成，内部基于[`koa-router`](https://github.com/ZijianHe/koa-router)中间件实现。 多应用模式适合对不同的应用类型使用不同的公用路由中间件，请注意尽量不要进行应用嵌套。
 
 #### > 应用配置
 
@@ -32,19 +32,19 @@ npx koavc dev
 ```
 ...
 app:[
-{
-  // * 应用根目录，只有这个参数是必须的
-  dir:"app",
-  // 应用访问的路由前缀，可以区分应用,默认空, eg：/admin
-  prefix:'',
-  // 路由对应的host,匹配的才生效,默认空
-  host:'',
-  // router的allowedMethods配置，默认空
-  allowedMethods:{},
-  // 公用路由中间件,这里的中间件可以访问router，,默认空
-  middlewares:['~/middlewares/auth.js'],
-}
-...
+  {
+    // * 应用根目录，只有这个参数是必须的
+    dir:"./app",
+    // 应用访问的路由前缀，可以区分应用,默认空, 表示根路由'/', eg：/admin
+    prefix:'',
+    // 路由对应的host,匹配的才生效,这很方便的对应用进行域名区分，默认空
+    host:'',
+    // router的allowedMethods配置，默认空
+    allowedMethods:{},
+    // 公用路由中间件,这里的中间件可以访问router，,默认空
+    middlewares:['~/middlewares/auth.js'],
+  }
+  ...
 ]
 ```
 
@@ -52,7 +52,9 @@ app:[
 
 #### > 应用目录
 
-应用目录下的路由文件会自动加载，目录结构与url结构匹配。 路径或文件名以`_`开头代表`泛路由`，代表`koa-router`路由中的 `:param`。参数可以通过`ctx.params`访问
+应用目录下的路由文件会自动加载，目录结构与url结构匹配。 路径或文件名以`_`开头代表`泛路由`，代表`koa-router`路由中的 `:param`。参数可以通过`ctx.params`访问. 
+
+`v1.4.0` 开始，`index.js`是目录下的默认路由文件。
 
 ```
 //====url: 
@@ -63,9 +65,10 @@ app:[
 app
 ---apis
 ------_cate
+---------index.js 目标路由文件   math:  /apis/client/
 ---------_id.js   目标路由文件   math:  /apis/client/1
 ------user
----------index.js 目标路由文件   math:  /apis/user/index
+---------index.js 目标路由文件   math:  /apis/user/index || /apis/user
 ---------_id.js   目标路由文件   math:  /apis/user/1    
 
 ```
