@@ -1,15 +1,15 @@
 **!!! V2.0.0版本变动比较大，更改为多应用配置模式，与之前版本不兼容，之前的版本请查看之前版本的README.md**
 
-###▌ 安装依赖库
+### 安装依赖库
 ```
 npm install koavc --save
 ```
-###▌ 初始化服务器配置
+### 初始化服务器配置
 
 通过配置 `koavc.config.js` 来配置服务器相关配置,具体查看配置文件。
 
 
-###▌ 运行服务
+### 运行服务
 ```
 #编译vue文件
 npx koavc build
@@ -21,7 +21,7 @@ npx koavc start
 npx koavc dev
 ```
 
-###▌ 应用（路由组 | controller组）
+### 应用（路由组 | controller组）
 
 `v2.0.0`开始变更为多应用模式，应用由设定的目录下的一组路由文件组成，内部基于[`koa-router`](https://github.com/ZijianHe/koa-router)中间件实现。 多应用模式适合对不同的应用类型使用不同的公用路由中间件，请注意尽量不要进行应用嵌套。
 
@@ -96,7 +96,7 @@ export default {
 ```
 
 
-###▌ 中间件
+### 中间件
 
 中间件支持两种`本地中间件`和`第三方中间件`。
 
@@ -161,7 +161,7 @@ etag(),                                 //3 直接传入第三方中间件
 ```
 
 
-###▌ alias
+### alias
 
 为了支持seo,内置实现了个简单的 `alias`中间件最为路由映射使用，如果想加载只需增加响应配置即可，也提供了api可以动态更新路由映射，具体参考API部分
 
@@ -178,7 +178,7 @@ alias: {
 }
 ```
 
-###▌ view
+### view
 服务端渲染视图模板根目录，支持多种渲染模式，可在配置文件`koavc.config.js`中的`view`对象来设置。  
 
 1、**在路由文件使用 `ctx.view` 方法来渲染模板文件**
@@ -235,7 +235,7 @@ statics:[
 ```
 
 
-###▌ API
+### API
 
 api都注入到了`context`上
 
@@ -272,6 +272,6 @@ ctx.alias.list()
 #### context.getRouteExtParam(paramName)  :v1.3.3
 用于router的中间件中，可以获取第一个匹配的router对应的controller的自定义扩展属性
 
-###▌ DEMO
+### DEMO
 
 查看[这里](https://github.com/cczw2010/koavc-example)
