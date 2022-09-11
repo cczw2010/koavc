@@ -61,12 +61,13 @@ export async function getRuntimeConfig(){
 // 初始化多应用的配置参数
 function initAppOptions(options){
   if(!options || options.length==0){
-    throw new Error("There should be at least one app in [koavc.config.js]")
+    throw new Error("There should be at least one app")
   }
   options.map((option,id)=>{
     if(!option.dir){
-      throw new Error(`The ${id}th app option [dir] is required in [koavc.config.js]`)
+      throw new Error(`The ${id}th app option [dir] is required`)
     }
+    option._dir = option.dir
     option.dir = resolve(option.dir)
     // if(!option.prefix){
     //   option.prefix = '/'

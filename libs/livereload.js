@@ -1,7 +1,7 @@
 import chokidar  from "chokidar"
 import hash from "hash-sum"
 import { WebSocketServer } from  'ws'
-
+import consola from "consola"
 let wsServer = null
 let watcher = null
 // 消息类型
@@ -14,15 +14,15 @@ export function startLiveServer(server){
   wsServer = new WebSocketServer({server})
   wsServer.on('connection', function(ws,request) {
     ws.on('message', function(data) {
-      // console.debug('client message %s',data);
+      // consola.debug('client message %s',data);
       const infos = data.toString().split("::")
       if(infos[0]==CLIENTMSGTYPE.connect){
         ws.pageUUID = infos[1]||0
-        // console.debug('client connected', ws.pageUUID );
+        // consola.debug('client connected', ws.pageUUID );
       }
     })
     // ws.on('close',function(){
-    //   console.debug('client close', ws.pageUUID );
+    //   consola.debug('client close', ws.pageUUID );
     // })
   })
   return wsServer
@@ -42,7 +42,7 @@ export function  initViewWatcher(watchpath,option,onChange){
   },option)
   watcher = chokidar.watch([].concat(watchpath),option)
   watcher.on('ready', () => {
-    // console.debug("livereload server start...",watcher.getWatched())
+    // consola.debug("livereload server start...",watcher.getWatched())
     watcher.on('change', (filepath,fstats)=>{
       filepath = onChange(filepath,fstats)
       if(filepath){
@@ -63,7 +63,7 @@ export function injectCode(pagePath){
     return false
   }
   const pageUUID = getPageUUid(pagePath)
-  // console.log('inject code',pagePath,pageUUID)
+  // consola.log('inject code',pagePath,pageUUID)
   const address = wsServer.address()
   return `<script type="text/javascript">
   var __livereload_uuid = '${pageUUID}'
@@ -113,10 +113,10 @@ export function injectCode(pagePath){
 export function reloadPage(pagePath){
   if(!wsServer) return
   const pageUUID = getPageUUid(pagePath)
-  console.debug("reloadPage：",pagePath,pageUUID)
+  consola.debug("reloadPage：",pagePath,pageUUID)
   wsServer.clients.forEach(function(client) {
     if (client.readyState === 1 && client.pageUUID==pageUUID) { //WebSocket.OPEN
-      // console.debug("client reload：",pagePath,client.pageUUID)
+      // consola.debug("client reload：",pagePath,client.pageUUID)
       client.send(CLIENTMSGTYPE.reload);
     }
   });

@@ -18,22 +18,30 @@ export default async (options,logger)=>{
   router.use(defMiddlewares)
   for (const option of options) {
     const appRouter = await initAppRouter(option)
-    router.use(appRouter.routes(),appRouter.allowedMethods(option.allowedMethods))
+    if(appRouter){
+      router.use(appRouter.routes(),appRouter.allowedMethods(option.allowedMethods))
+    }
     // router.use(appRouter.routes())
   }
   return router
 }
 // 初始化一个应用路由
 async function initAppRouter(option){
-  const {dir,prefix,host,middlewares} = option
-  // // exclusive为false 注入全局route支持
-  const router = new Router({host,prefix,exclusive:false})
-  Logger.info("loading router global middlewares...")
-  const appMiddlewares = await middlewaresLoader(middlewares)
-  router.use(appMiddlewares)
-  Logger.info("loading router controllers...")  
-  await travel(dir,router,dir)
-  return router
+  const {dir,_dir,prefix,host,middlewares} = option
+  Logger.info(`loading app : [${_dir}]...`)
+  try{
+    // // exclusive为false 注入全局route支持
+    const router = new Router({host,prefix,exclusive:false})
+    // Logger.info("loading router global middlewares...")
+    const appMiddlewares = await middlewaresLoader(middlewares)
+    router.use(appMiddlewares)
+    // Logger.info("loading router controllers...")  
+    await travel(dir,router,dir)
+    return router
+  }catch(e){
+    Logger.error('App loading ignored with error.',e)
+    return false
+  }
 }
 
 

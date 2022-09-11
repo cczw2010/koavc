@@ -27,8 +27,11 @@ export default async function(config){
     // logger.debug("load alias...")
     app.use(await alias(config.alias,logger))
   }
-  // 加载全局中间件
-  await middlewaresLoader(config.middlewares,app,logger)
+  // 加载全局中间件,失败将退出应用
+  await middlewaresLoader(config.middlewares,app,logger).catch(e=>{
+    logger.error(e)
+    process.exit(1)
+  })
   // 初始化view
   app.context.view = await viewer(config.view)
   // 初始化多应用

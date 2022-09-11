@@ -1,7 +1,8 @@
 import spawn from "cross-spawn"
 import chokidar  from "chokidar"
-import {getRuntimeConfig} from "../index.js"
 import { resolve } from "path"
+import consola from "consola"
+import {getRuntimeConfig} from "../index.js"
 
 let workProcess = null
 let scriptPath = null
@@ -75,13 +76,13 @@ async function watcher(){
     interval: 1000,
   })
   watcher.on('ready', async() => {
-    watcher.on('change', async (filepath, stats) => {
+    watcher.on('change', (filepath, stats) => {
       // console.log("change",filepath)
-      runWorkProcess()
+      runWorkProcessWithCheck(filepath)
     })
-    watcher.on('add', async (filepath) => {
+    watcher.on('add', (filepath) => {
       // console.log("add",filepath)
-      runWorkProcess()
+      runWorkProcessWithCheck(filepath)
     })
   })
 }
@@ -98,4 +99,16 @@ function getLocalMiddlewarePath(middleware){
     return resolve(filepath.replace(/^~/,'.'))
   }
   return null
+}
+
+// 检查文件正确性 然后再加载
+async function runWorkProcessWithCheck(filepath){
+  // 增加参数，避免import模块缓存
+  await import(`${filepath}?${Date.now()}`).then(m=>{
+    runWorkProcess()
+  }).catch(e=>{
+    consola.error(filepath,e)
+    return false
+  })
+ 
 }

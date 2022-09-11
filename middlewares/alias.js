@@ -11,7 +11,7 @@ function checkFun(fun,logger){
     if(Object.prototype.toString.call(fun)=="[object AsyncFunction]"){
       return fun
     }
-    console.log(fun)
+    // console.log(fun)
     logger.error(`alias option: [${fun.name}] must be a AsyncFunction`)
     process.exit(0)
   }

@@ -1,3 +1,4 @@
+import consola from "consola"
 /**
  * 加载并初始化所有配置的middleware
  * @export Promise
@@ -14,10 +15,9 @@
   // 加载所有的全局配置中间件
   options = options||[]
   for (const item of options) {
-    const middlewares = await loadMiddleware(item)
-    if(!middlewares || middlewares.length==0){
-      throw new Error(`ignored invalid middleware [${item}]`)
-    }
+    const middlewares = await loadMiddleware(item).catch(e=>{
+      throw new Error(`Invalid middleware,${e.message}`)
+    })
     if(ctx){
       middlewares.map(m=>ctx.use(m))
     }
@@ -37,14 +37,16 @@ async function loadMiddleware(middlewareOption){
   if(typeof middlewareOption == "function"){
     return [middlewareOption]
   }
-  let middlewarePath = middlewareOption
+  let optionPath = middlewareOption
   let option = null
   if(Array.isArray(middlewareOption)){
-    middlewarePath = middlewareOption[0]
+    optionPath = middlewareOption[0]
     option = middlewareOption[1]
   }
-  middlewarePath = middlewarePath.replace(/^~/ig,process.env.PWD)
-  const middlewareInit = await import(middlewarePath).then(m=>m.default)
+  const middlewarePath = optionPath.replace(/^~/ig,process.env.PWD)
+  const middlewareInit = await import(middlewarePath).then(m=>m.default).catch(e=>{
+    throw new Error(`[${optionPath}]:${e.toString()}`)
+  })
 
   // 执行初始化方法返回中间件，v1.3.4支持返回多个中间件数组,方便集成其他中间件
   let middlewares = []
@@ -53,5 +55,11 @@ async function loadMiddleware(middlewareOption){
   }else if(middlewareInit instanceof Function){
     middlewares = middlewareInit(option)
   }
-  return [].concat(middlewares)
+  middlewares =  [].concat(middlewares)
+  middlewares.map(m=>{
+    if(typeof m !='function'){
+      throw new Error(`[${optionPath}] returned must be function or function array.`)
+    }
+  })
+  return middlewares
 }
