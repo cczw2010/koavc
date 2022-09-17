@@ -90,7 +90,7 @@ export default {
     //路由实际逻辑部分
     fn:async (ctx,next)=>{
         ctx.body = 'login page';
-        //ctx.view("pages/index",{...datas})
+        //await ctx.view("pages/index.vue",{...datas})
     }
 }
 ```
@@ -169,11 +169,11 @@ etag(),                                 //3 直接传入第三方中间件
 
 ```javascript
 alias: {
- //可选，初始化获取alias列表对象的方法，格式{aliasPath:directTo},不提供的话为空,
+ //可选，AsyncFunction方法,初始化获取alias列表对象的方法，格式{aliasPath:directTo},不提供的话为空,
  get:asyncFunction
- //可选，本地化保存alias的方法，不提供的存在缓存               
+ //可选，AsyncFunction方法,本地化保存alias的方法，不提供的存在缓存               
  set:asyncFunction(aliasPath,directTo)   
- //可选，本地化删除alias的方法，不提供的存在缓存
+ //可选，AsyncFunction方法,本地化删除alias的方法，不提供的存在缓存
  del:asyncFunction(aliasPath)
 }
 ```
@@ -185,12 +185,12 @@ alias: {
 
 ```javascript
 /**
- *	渲染模板
+ *	渲染模板 promise
  * `viewpath` : 模板文件的相对于`view`根目录的相对路径
  *					（eg： home.html ,   web/home.vue）
  * `data`     : 注入模板中的数据对象
  * /
-ctx.view(viewpath,data)
+await ctx.view(viewpath,data)
 
 ```
 
@@ -258,7 +258,7 @@ api都注入到了`context`上
 ```
 
 #### context.alias
-路由别名映射对象,路径都是相对于根目录
+路由别名映射对象,路径都是相对于根目录，都是Async Function
 
 ctx.alias.set(aliasPath,redirectTo)
 
@@ -267,7 +267,7 @@ ctx.alias.del(aliasPath)
 ctx.alias.list()
 
 #### context.view(tplPath,data)
-根据配置的渲染引擎，加载渲染模板
+根据配置的渲染引擎，加载渲染模板，Async Function
 
 #### context.getRouteExtParam(paramName)  :v1.3.3
 用于router的中间件中，可以获取第一个匹配的router对应的controller的自定义扩展属性
