@@ -56,6 +56,7 @@ async function travel(dir,router,appBaseDir) {
   for (const k in files) {
     const file = files[k];
     const pathname = join(dir, file)
+    const relativePathname = relative(process.env.PWD,pathname)
     const stats = await stat(pathname)
     
     if (stats.isDirectory()) {
@@ -63,8 +64,12 @@ async function travel(dir,router,appBaseDir) {
     } else if(pathname.endsWith('.js')){
 
       let m = await import(pathname).then(module=>module.default).catch(e=>e)
-      if(!m || m instanceof Error){
-        Logger.error(`Invalid route controller [${pathname}]`,m)
+      if(!m ){
+        Logger.error(`[${relativePathname}] returned empty`)
+        continue
+      }
+      if(m instanceof Error){
+        Logger.error(`[${relativePathname}]`,m)
         continue
       }
 
@@ -90,12 +95,12 @@ async function travel(dir,router,appBaseDir) {
       //3 middlewares
       if(m.middlewares && m.middlewares.length>0){
         const middlewares = await middlewaresLoader(m.middlewares).catch(e=>{
-          Logger.error(`Invalid route controller [${pathname}]`,e)
+          Logger.error(`[${relativePathname}] middlewares Loading error.`,e)
           return false
         })
         if(!middlewares){
           continue
-        }git 
+        }
         middlewares.map(m=> params.push(m))
       }
       // 4 fn 实际页面逻辑中间件方法
