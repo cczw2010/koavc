@@ -39,7 +39,7 @@ async function initAppRouter(option){
     await travel(dir,router,dir)
     return router
   }catch(e){
-    Logger.error('App loading ignored with error.',e)
+    Logger.error(`app [${_dir}] loading error.`,e)
     return false
   }
 }
@@ -61,14 +61,13 @@ async function travel(dir,router,appBaseDir) {
     if (stats.isDirectory()) {
       await travel(pathname,router,appBaseDir);
     } else if(pathname.endsWith('.js')){
-      let m = await import(pathname).then(module=>module.default).catch(e=>{
-        Logger.error(pathname,e)
-        // Logger.warn(`Invalid route controller [${pathname}]`)
-        return false
-      })
-      if(!m){
-        return false
+
+      let m = await import(pathname).then(module=>module.default).catch(e=>e)
+      if(!m || m instanceof Error){
+        Logger.error(`Invalid route controller [${pathname}]`,m)
+        continue
       }
+
       const params = []
       //1 route name
       if(m.name){
@@ -90,7 +89,13 @@ async function travel(dir,router,appBaseDir) {
       params.push(paths)
       //3 middlewares
       if(m.middlewares && m.middlewares.length>0){
-        const middlewares = await middlewaresLoader(m.middlewares)
+        const middlewares = await middlewaresLoader(m.middlewares).catch(e=>{
+          Logger.error(`Invalid route controller [${pathname}]`,e)
+          return false
+        })
+        if(!middlewares){
+          continue
+        }git 
         middlewares.map(m=> params.push(m))
       }
       // 4 fn 实际页面逻辑中间件方法
