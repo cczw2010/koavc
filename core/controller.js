@@ -65,11 +65,11 @@ async function travel(dir,router,appBaseDir) {
 
       let m = await import(pathname).then(module=>module.default).catch(e=>e)
       if(!m ){
-        Logger.error(`[${relativePathname}] returned empty`)
+        Logger.warn(`ignored [${relativePathname}], returned default is empty.`)
         continue
       }
       if(m instanceof Error){
-        Logger.error(`[${relativePathname}]`,m)
+        Logger.error(`ignored [${relativePathname}]`,m)
         continue
       }
 
@@ -95,7 +95,7 @@ async function travel(dir,router,appBaseDir) {
       //3 middlewares
       if(m.middlewares && m.middlewares.length>0){
         const middlewares = await middlewaresLoader(m.middlewares).catch(e=>{
-          Logger.error(`[${relativePathname}] middlewares Loading error.`,e)
+          Logger.error(`ignored [${relativePathname}]. middlewares Loading error. `,e)
           return false
         })
         if(!middlewares){
