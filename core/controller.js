@@ -95,7 +95,7 @@ async function travel(dir,router,appBaseDir) {
       //3 middlewares
       if(m.middlewares && m.middlewares.length>0){
         const middlewares = await middlewaresLoader(m.middlewares).catch(e=>{
-          Logger.error(`ignored [${relativePathname}]. middlewares Loading error. `,e)
+          Logger.error(`ignored [${relativePathname}].`,e)
           return false
         })
         if(!middlewares){
