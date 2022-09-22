@@ -10,6 +10,9 @@ npm install koavc --save
 
 
 ### 运行服务
+
+提供了基本的命令，建议写入项目的script中直接调用
+
 ```
 #编译vue文件
 npx koavc build
@@ -160,7 +163,6 @@ etag(),                                 //3 直接传入第三方中间件
 ...
 ```
 
-
 ### alias
 
 为了支持seo,内置实现了个简单的 `alias`中间件最为路由映射使用，如果想加载只需增加响应配置即可，也提供了api可以动态更新路由映射，具体参考API部分
@@ -234,6 +236,20 @@ statics:[
     
 ```
 
+
+### 开发模式
+
+开发模式下`npx koavc dev`，包含服务端热重载和客户端热重载（is livereload,not hmr）.
+
+客户端会在模板文件变动后自动刷新浏览器。
+
+服务端代码会在`app`相关route，middleware,koavc.config.js文件变动时触发热重载。
+
+为了应对复杂环境，`v2.0.6`开始也可在配置文件中修改配置增加监控目录：
+
+```
+watchs:['model','libs/src']
+```
 
 ### API
 

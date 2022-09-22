@@ -54,7 +54,7 @@ function runWorkProcess(){
 async function watcher(){
   const config = await getRuntimeConfig()
   // 启动简单的配置文件监控文件变化，然后服务restart
-  let watchPaths = [resolve('./koavc.config.js')]
+  let watchPaths = [resolve('./koavc.config.js')].concat(config.watchs)
   // global middlewares
   config.middlewares.map((v)=>{
     let filepath = getLocalMiddlewarePath(v)

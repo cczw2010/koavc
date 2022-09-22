@@ -23,7 +23,6 @@ export default {
       dir:'logs',     // 日志目录
     }
   },
- 
   //============view渲染配置  
   view:{
     src:'view',         //相对于根目录
@@ -40,6 +39,8 @@ export default {
   statics:[
     ['/static',rootDist],   //vue输出目录挂载到`/static`路由上
   ],
+  //=================dev
+  watchs:[],    //额外的监控目录，dev模式下变动会重启服务
   //============vuesfcbuilder
   vuesfcbuilder: {
     injectStyle:'/static', 
