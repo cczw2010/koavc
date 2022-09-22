@@ -54,7 +54,7 @@ function runWorkProcess(){
 async function watcher(){
   const config = await getRuntimeConfig()
   // 启动简单的配置文件监控文件变化，然后服务restart
-  let watchPaths = [resolve('./koavc.config.js')].concat(config.watchs)
+  let watchPaths = ['./koavc.config.js'].concat(config.watchs)
   // global middlewares
   config.middlewares.map((v)=>{
     let filepath = getLocalMiddlewarePath(v)
@@ -62,7 +62,7 @@ async function watcher(){
   })
   // apps
   config.app.map(appconfig=>{
-    watchPaths.push(resolve(appconfig.dir))
+    watchPaths.push(appconfig.dir)
     // app  middlewares
     appconfig.middlewares.map((v)=>{
       let filepath = getLocalMiddlewarePath(v)
@@ -71,11 +71,13 @@ async function watcher(){
   })
   // console.log("watchPath",watchPaths)
   const watcher = chokidar.watch(watchPaths, {
+    cwd:process.env.PWD,
     ignored: /(^|[\/\\])\../, // ignore dotfiles
     persistent: true,
     interval: 1000,
   })
   watcher.on('ready', async() => {
+    // console.log(watchPaths)
     watcher.on('change', (filepath, stats) => {
       // console.log("change",filepath)
       runWorkProcessWithCheck(filepath)
@@ -96,7 +98,7 @@ function getLocalMiddlewarePath(middleware){
   }
   if(filepath && filepath.startsWith('~')){
     // watchPaths.push(filepath.replace(/^~/,process.env.PWD))
-    return resolve(filepath.replace(/^~/,'.'))
+    return filepath.replace(/^~/,'.')
   }
   return null
 }
@@ -104,7 +106,7 @@ function getLocalMiddlewarePath(middleware){
 // 检查文件正确性 然后再加载
 async function runWorkProcessWithCheck(filepath){
   // 增加参数，避免import模块缓存
-  await import(`${filepath}?${Date.now()}`).then(m=>{
+  await import(`${resolve(filepath)}?${Date.now()}`).then(m=>{
     runWorkProcess()
   }).catch(e=>{
     consola.error(filepath,e)
