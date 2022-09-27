@@ -11,8 +11,9 @@ let clientManifest = null
 export default {
   name:"vue",
   // 根据传入的引擎配置初始化
-  // init(option){
-  // },
+  init(option){
+    clientManifest = JSON.parse(readFileSync(versPath,{encoding:"utf8"}))
+  },
   // 防止使用默认配置
   transferPath(path){
     return path
@@ -42,10 +43,13 @@ export default {
       const diffs = updatedDiff(clientManifest,newManifest)
       // console.log('vue  clientManifest>>>>>>',diffs)
       clientManifest = newManifest
+      const diffpages = []
       for (const page in diffs) {
-        if(page!='root')
-        return page
+        if(page!='root'){
+          diffpages.push(page)
+        }
       }
+      return diffpages
     }catch(e){
       throw new Error('version manifest file get error')
     }

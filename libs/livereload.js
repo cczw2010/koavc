@@ -44,10 +44,10 @@ export function  initViewWatcher(watchpath,option,onChange){
   watcher.on('ready', () => {
     // consola.debug("livereload server start...",watcher.getWatched())
     watcher.on('change', (filepath,fstats)=>{
-      filepath = onChange(filepath,fstats)
-      if(filepath){
-        reloadPage(filepath)
-      }
+      let changes = onChange(filepath,fstats)
+      if(!changes){return}
+      changes = [].concat(changes)
+      changes.forEach(reloadPage)
     })
   })
 }
