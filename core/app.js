@@ -1,6 +1,7 @@
 import Koa from "koa"
 import staticServe from "koa-static"
 import mount from "koa-mount"
+import { rootDist } from "vuesfc"
 import {createLogger} from '../libs/logger.js'
 import loadControllers from './controller.js'
 import viewer from './view/index.js'
@@ -16,7 +17,10 @@ export default async function(config){
   })
   app.context.Config = config
   app.context.logger =logger
-  // 初始化静态服务，放上面,下面的中间件就不会响应静态服务的内容了
+  // 初始化静态服务，(vue & 自定义)放上面,下面的中间件就不会响应静态服务的内容了
+  if(config.view.engine=='vue' && typeof config.vueInjectPath=='string'){
+    app.use(mount(config.vueInjectPath,staticServe(rootDist)),{defer:true})
+  }
   if(config.statics){
     for(const staticInfo of config.statics){
       app.use(mount(staticInfo[0],staticServe(staticInfo[1])),{defer:true})

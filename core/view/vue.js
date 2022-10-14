@@ -1,7 +1,7 @@
 // 模板文件请使用单文件模式
 // 注意，该模式应该区分服务器端渲染，可服务器端注入（只预注入数据和处理中间件，而不进行直接vue渲染），暂时定位为后
 import {readFileSync} from "fs"
-import  {renderer,versPath} from "vuesfcbuilder"
+import  {renderer,versPath} from "vuesfc"
 import {  updatedDiff } from 'deep-object-diff'
 // console.log(clientManifest)
 //TODO lru-cache  缓存
@@ -41,13 +41,11 @@ export default {
         return false
       }
       const diffs = updatedDiff(clientManifest,newManifest)
-      // console.log('vue  clientManifest>>>>>>',diffs)
       clientManifest = newManifest
       const diffpages = []
-      for (const page in diffs) {
-        if(page!='root'){
-          diffpages.push(page)
-        }
+      if(diffs && diffs.page)
+      for (const page in diffs.page) {
+        diffpages.push(page)
       }
       return diffpages
     }catch(e){

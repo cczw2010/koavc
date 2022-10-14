@@ -2,7 +2,6 @@ import spawn from "cross-spawn"
 import chokidar  from "chokidar"
 import { resolve } from "path"
 import consola from "consola"
-import {getRuntimeConfig} from "../index.js"
 
 let workProcess = null
 let scriptPath = null
@@ -18,12 +17,12 @@ process.on("exit", function(code){
 })
 
 // 启动服务进程，如果存在会自动先干掉
-export default function(){
-  const scriptFile = process.env.NODE_ENV === 'production'?'../scripts/start.js':'../scripts/dev.js'
+export default function(config,isDev){
+  const scriptFile = !isDev?'../scripts/start.js':'../scripts/dev.js'
   scriptPath = new URL(scriptFile,import.meta.url).pathname
   runWorkProcess()
-  if(process.env.NODE_ENV!=='production'){
-    watcher()
+  if(isDev){
+    watcher(config)
   }
 }
 // 启动server 进程
@@ -31,7 +30,6 @@ function runWorkProcess(){
   if(workProcess){
     workProcess.kill()
   }
-  
   workProcess = spawn(
     'node',
     [scriptPath],
@@ -51,8 +49,7 @@ function runWorkProcess(){
   // console.log("workProcess running.... ",workProcess.pid)
 }
 // 监控器 用于开发模式，文件变化会重启server进程
-async function watcher(){
-  const config = await getRuntimeConfig()
+async function watcher(config){
   // 启动简单的配置文件监控文件变化，然后服务restart
   let watchPaths = ['./koavc.config.js'].concat(config.watchs)
   // global middlewares

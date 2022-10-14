@@ -1,5 +1,3 @@
-import { rootDist } from "vuesfcbuilder"
-
 export default {
   //============ 服务器配置
   host:'127.0.0.1',
@@ -36,20 +34,7 @@ export default {
   // 全局koa中间件，在route之前执行
   middlewares:[],
   // 设置静态目录服务
-  statics:[
-    ['/static',rootDist],   //vue输出目录挂载到`/static`路由上
-  ],
+  statics:[],
   //=================dev
   watchs:[],    //额外的监控目录，dev模式下变动会重启服务
-  //============vuesfcbuilder
-  vuesfcbuilder: {
-    injectStyle:'/static', 
-    injectScript:'/static',
-    buildModules:{
-      // vuetify:{
-      //   // meta:{},
-      //   option:{}
-      // }
-    }
-  }
 }

@@ -180,6 +180,16 @@ alias: {
 }
 ```
 
+### statics
+ 
+静态路由目录，可配置多个 ,如果view引擎为vue，且项目的`vuesfc.config.js`中配置了`injectPath`路径，将自动将vue编译的资源文件挂载到该路径上
+
+```
+statics:[
+  ['/static',/**xxxx**/], 
+]
+```
+
 ### view
 服务端渲染视图模板根目录，支持多种渲染模式，可在配置文件`koavc.config.js`中的`view`对象来设置。  
 
@@ -206,7 +216,7 @@ await ctx.view(viewpath,data)
   
   ```
 
-  * **`vue`**  基于vue2的ssr单文件（SFC）渲染引擎，封装了[vuesfcbuiler](https://github.com/cczw2010/vuesfcbuilder)库来使用服务器端渲染，借鉴了一些`nuxt`,支持布局文件和页面文件以及组件.[参考](https://www.w3cschool.cn/vuessr/)。 详细说明和配置可查看`vuesfcbuilder`项目说明 ，或者`koavc`包根目录下的[默认配置文件](./vuesfcbuilder.config.js),
+  * **`vue`**  基于vue2的ssr单文件（SFC）渲染引擎，借鉴了`nuxt`封装了[vuesfc](https://github.com/cczw2010/vuesfc)库来使用服务器端渲染，支持布局文件和页面文件以及组件. 详细说明和配置可查看`vuesfc`项目说明。可在项目目录下建立`vuesfc.config.js`来个性化配置。  
 
 
 3、 **配置**
@@ -214,7 +224,7 @@ await ctx.view(viewpath,data)
 ```javascript
 <!-- 相关engine初始化时传入 -->
 view:{
-  <!-- 模板文件的默认根目录地址，（vue是在vuesfcbuilder总独立配置的）-->
+  <!-- 模板文件的默认根目录地址-->
   src:'view',
   <!-- 渲染引擎 default | lodash | vue ，可自行拓展  -->
   engine:'vue',
@@ -225,14 +235,6 @@ view:{
   }
 
 },
-<!-- vue时有效，参数为vuesfcrender库的配置 -->
-vuesfcbuilder:{
-  /*vuesfcrender的配置*/
-},
-<!-- 静态路由目录，可配置多个 -->
-statics:[
-  ['/static',/**vuerootDist**/],   //默认，vue输出目录挂载到`/static`路由上
-]
     
 ```
 

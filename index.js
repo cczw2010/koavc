@@ -15,7 +15,7 @@ process.on("uncaughtException",(e)=>{
 // })
 // 启动生产web服务
 export async function run(callback){
-  const config = await getRuntimeConfig()
+  const config = await getConfig()
   const app = await initApp(config)
   const httpsOption = config.https
   const serverSchame = httpsOption?https:http
@@ -46,11 +46,15 @@ export async function run(callback){
  * 加载项目自定义的config文件，合并生成运行时config文件
  * @export object
  */
-export async function getRuntimeConfig(){
+export async function getConfig(){
   try{
     const localConfig = await import(resolve("./koavc.config.js")).then(m=>m.default)
     const config = deepmerge(defConfig,localConfig)
     config.app = initAppOptions(config.app)
+    // vuesfcconfig中 injectPath如果设置了，就自动挂载生成vue编译资源文件静态服务
+    config.vueInjectPath =  await import(resolve("./vuesfc.config.js")).then(m=>m.default.injectPath).catch(e=>{
+      return false
+    })
     return config
   }catch(e){
     consola.error('Error in [koavc.config.js].',e)
