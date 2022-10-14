@@ -52,7 +52,7 @@ export async function getConfig(){
     const config = deepmerge(defConfig,localConfig)
     config.app = initAppOptions(config.app)
     // vuesfcconfig中 injectPath如果设置了，就自动挂载生成vue编译资源文件静态服务
-    config.vueInjectPath =  await import(resolve("./vuesfc.config.js")).then(m=>m.default.injectPath).catch(e=>{
+    config.vueInjectPath =  await import(resolve("./vuesfc.config.js")).then(m=>m.default.injectUrl).catch(e=>{
       return false
     })
     return config
