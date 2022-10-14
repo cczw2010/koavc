@@ -111,7 +111,6 @@ export function injectCode(pagePath){
 }
 // 热重载某个页面
 export function reloadPage(pagePath){
-  console.debug(">>>>>>>>>>>reloadPage",pagePath)
   if(!wsServer) return
   const pageUUID = getPageUUid(pagePath)
   consola.debug("reloadPage：",pagePath,pageUUID)

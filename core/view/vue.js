@@ -3,6 +3,7 @@
 import {readFileSync} from "fs"
 import  {renderer,versPath} from "vuesfc"
 import {  updatedDiff } from 'deep-object-diff'
+import { basename } from "path"
 // console.log(clientManifest)
 //TODO lru-cache  缓存
 // const LRU = require('lru-cache')
@@ -47,6 +48,15 @@ export default {
       for (const page in diffs.page) {
         diffpages.push(page)
       }
+      for (const layoutKey in diffs.layout) {
+        const layoutName = layoutKey.split('.')[0]
+        for (const pageName in newManifest.page) {
+          if(newManifest.page[pageName].layout == layoutName){
+            diffpages.push(pageName)
+          }
+        }
+      }
+      // console.debug(">>>>>>>>>>>>>>>>",diffs,diffpages)
       return diffpages
     }catch(e){
       throw new Error('version manifest file get error')

@@ -10,6 +10,7 @@ import { getConfig } from "../index.js"
 const Config = await getConfig()
 switch (process.argv[2]) {
   case "build":
+    process.env.KOAVC_ENV = "production"
     if(Config.view.engine=="vue"){
       consola.log(sysColor('vue builder start...'))
       compiler(null,false)
@@ -19,6 +20,7 @@ switch (process.argv[2]) {
     // build()
     break;
   case "start":
+    process.env.KOAVC_ENV = "production"
     consola.log(`> koavc run with [${chalk.yellow('production')}] mode`)
     if(Config.view.engine=="vue"){
       const vuesfcConfig = await getVueSfcConfig()
@@ -32,6 +34,7 @@ switch (process.argv[2]) {
     break;
   case "dev":
   case undefined:
+    process.env.KOAVC_ENV = "development"
     consola.log(`> koavc run with [${chalk.yellow('development')}] mode ♻️`)
     if(Config.view.engine=="vue"){
       consola.log(sysColor('vue builder start...'))

@@ -7,7 +7,7 @@ export default async (options)=>{
   options = options||{}
   options.src = options.src||'view'
   const engine = options.engine||'default'
-  const isDev = process.env.NODE_ENV !== 'production'
+  const isDev = process.env.KOAVC_ENV !== 'production'
   const renderEngine = (await import(`./${engine}.js`)).default
   // 如果有初始化方法则初始化
   if('init' in renderEngine){
