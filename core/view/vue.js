@@ -1,13 +1,13 @@
 // 模板文件请使用单文件模式
 // 注意，该模式应该区分服务器端渲染，可服务器端注入（只预注入数据和处理中间件，而不进行直接vue渲染），暂时定位为后
 import {readFileSync} from "fs"
-import  {renderer,versPath} from "vuesfc"
+import  {renderer,versPath,getRenderInfo} from "vuesfc"
 import {  updatedDiff } from 'deep-object-diff'
-import { basename } from "path"
 // console.log(clientManifest)
-//TODO lru-cache  缓存
 // const LRU = require('lru-cache')
 let clientManifest = null
+// url中带有该key则返回 pageRenderInfo json数据
+export const vuepPageRenderInfoKey = '_page_json'
 // 模板方法
 export default {
   name:"vue",
@@ -25,7 +25,12 @@ export default {
   },
   // 渲染
   async compiled(path,data,ctx){
-    return await renderer(path,data,ctx)
+    // 如果参数中带着_pagejson,返回pagrenderinfo 的json数据
+    if(vuepPageRenderInfoKey in  ctx.query){
+      return await getRenderInfo(path,data,ctx)
+    }else{
+      return await renderer(path,data,ctx)
+    }
     // ctx.body = html
   },
   // ====================== for dev liveload

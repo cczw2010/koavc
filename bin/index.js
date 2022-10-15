@@ -6,6 +6,8 @@ import {compiler,getRuntimeConfig as getVueSfcConfig} from "vuesfc"
 import runServer from "./run.js"
 import { getConfig } from "../index.js"
 // import build from "../scripts/build.js"
+const extComponentsDir = new URL("../components",import.meta.url).pathname
+consola.log("extComponentsDir：",extComponentsDir)
 
 const Config = await getConfig()
 switch (process.argv[2]) {
@@ -13,7 +15,7 @@ switch (process.argv[2]) {
     process.env.KOAVC_ENV = "production"
     if(Config.view.engine=="vue"){
       consola.log(sysColor('vue builder start...'))
-      compiler(null,false)
+      compiler(null,false,[extComponentsDir])
     }else{
       consola.warn('View complier engine is not [vue], ignore vue complier! ')
     } 
@@ -41,7 +43,7 @@ switch (process.argv[2]) {
       compiler(()=>{
         consola.log(sysColor('Initilize server...'))
         runServer(Config,true)
-      },true)
+      },true,[extComponentsDir])
     }else{
       consola.log(sysColor('Initilize server...'))
       runServer(Config,true)

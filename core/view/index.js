@@ -31,13 +31,13 @@ export default async (options)=>{
     const ctx = this
     data = data||{}
 
-    let html = null
+    let result = null
     // 0 先获取缓存
     if(viewCache){
-      html = await viewCache.get(ctx.href)
-      if(html){
-        ctx.body = html
-        return html
+      result = await viewCache.get(ctx.href)
+      if(result){
+        ctx.body = result
+        return result
       }
     }
     // 1转换path, 渲染引擎提供转换函数或者使用默认
@@ -59,21 +59,22 @@ export default async (options)=>{
       sourceData = buffer?buffer.toString():''
     }
     // 3 编译
-    html = await renderEngine.compiled(sourceData,data,ctx)
-    if(html){
-      if(isDev){
+    result = await renderEngine.compiled(sourceData,data,ctx)
+    if(result){
+      const isJson = typeof result == 'object'
+      if(isDev && !isJson){
         // 开发模式注入livereload
         const injectJs = injectCode(filePath)
         if(injectJs){
-          html+=injectJs
+          result+=injectJs
         }
       }
        // 4 存缓存
       if(viewCache){
-        viewCache.set(ctx.href,html)
+        viewCache.set(ctx.href,result)
       }
-      ctx.body = html
+      ctx.body = result
     }
-    return html
+    return result
   }
 }

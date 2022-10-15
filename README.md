@@ -230,6 +230,13 @@ view:{
   src:'view',
   <!-- 渲染引擎 default | lodash | vue ，可自行拓展  -->
   engine:'vue',
+  // 引擎对应的配置，如果有的话
+  engineOption:{
+    // for vue, 代表异步请求的url的query中的参数
+    asyncPageKey:'_asyncpage',
+    componentLoad:'_asyncpage',
+    componentError:'_asyncpage',
+  }
   // 页面静态化缓存，传入false关闭,true使用默认参数, (version:1.3.1)
   cache:{
     dir:'.koavc/pagecache',  //默认
