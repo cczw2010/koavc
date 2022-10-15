@@ -13,6 +13,7 @@ let Logger = null
 
 export default async (options,logger)=>{
   Logger = logger||console
+  // 根router
   const router = new Router()
   const defMiddlewares = await middlewaresLoader(defAppMiddlewares)
   router.use(defMiddlewares)
@@ -30,8 +31,11 @@ async function initAppRouter(option){
   const {dir,_dir,prefix,host,middlewares} = option
   Logger.info(`loading app : [${_dir}]...`)
   try{
-    // // exclusive为false 注入全局route支持
-    const router = new Router({host,prefix,exclusive:false})
+    // exclusive为false 注入全局route支持
+    const router = new Router({host,exclusive:false})
+    if(prefix){
+      router.prefix(prefix)
+    }
     // Logger.info("loading router global middlewares...")
     const appMiddlewares = await middlewaresLoader(middlewares)
     router.use(appMiddlewares)
@@ -82,7 +86,9 @@ async function travel(dir,router,appBaseDir) {
       const paths = []
       // 2.1index.js  简写支持
       if(file.toLowerCase()=='index.js'){
-        paths.push(join('/',relative(appBaseDir,dir)))
+        const route = join('/',relative(appBaseDir,dir))
+        // console.log(">>>>>>>>>>>",route)
+        paths.push(route)
       }
       // 2.2
       const route = relative(appBaseDir,pathname).replace(/\.js$/i,'').replace(/\/_/g,'\/:')
@@ -110,6 +116,8 @@ async function travel(dir,router,appBaseDir) {
       // 5 add router
       const method = m.method?m.method.toLowerCase():'all'
       const result = router[method](...params)
+      // console.log(paths,result.stack)
+
       // 6 ext params  v1.3.3
       if(!result.opts.exclusive){
         const extparams = {}

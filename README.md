@@ -36,16 +36,18 @@ npx koavc dev
 ...
 app:[
   {
-    // * 应用根目录，只有这个参数是必须的
+    // * 应用根目录，注意多应用不要嵌套，防止出现不可预计的错误
     dir:"./app",
-    // 应用访问的路由前缀，可以区分应用,默认空, 表示根路由'/', eg：/admin
-    prefix:'',
+    // 应用访问的路由前缀，可以区分应用,不设置默认表示根路由'/', eg：/web
+    prefix:'/web',
     // 路由对应的host,匹配的才生效,这很方便的对应用进行域名区分，默认空
     host:'',
     // router的allowedMethods配置，默认空
     allowedMethods:{},
     // 公用路由中间件,这里的中间件可以访问router，,默认空
     middlewares:['~/middlewares/auth.js'],
+    <!-- 异常页面网址，400以上的错误会redirectTo:${errorPage}/statusCode -->
+    errorPage:'/error'
   }
   ...
 ]

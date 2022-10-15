@@ -5,6 +5,7 @@ import { rootDist } from "vuesfc"
 import {createLogger} from '../libs/logger.js'
 import loadControllers from './controller.js'
 import viewer from './view/index.js'
+import routeGuard from "../middlewares/routeGuard.js"
 import alias from '../middlewares/alias.js'
 import { middlewaresLoader } from './middleware.js'
 
@@ -15,6 +16,7 @@ export default async function(config){
   app.on('error', (err, ctx) => {
     logger.error(err)
   })
+
   app.context.Config = config
   app.context.logger =logger
   // 初始化静态服务，(vue & 自定义)放上面,下面的中间件就不会响应静态服务的内容了
@@ -38,6 +40,8 @@ export default async function(config){
   })
   // 初始化view
   app.context.view = await viewer(config.view)
+  // 全局路由守护，不在app的router中单独设置是因为，app中可能设置了各种自定义分middlerware,会冲突，比如auth
+  app.use(routeGuard(config.app))
   // 初始化多应用
   const router = await loadControllers(config.app,logger)
   app.use(router.routes())
