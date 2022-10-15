@@ -46,7 +46,7 @@ app:[
     allowedMethods:{},
     // 公用路由中间件,这里的中间件可以访问router，,默认空
     middlewares:['~/middlewares/auth.js'],
-    <!-- 异常页面网址，400以上的错误会redirectTo:${errorPage}/statusCode -->
+    <!-- 异常页面网址，400以上的错误会redirectTo:${errorPage}/${ctx.status}-->
     errorPage:'/error'
   }
   ...
