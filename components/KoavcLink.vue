@@ -9,33 +9,6 @@
   </span>
 </template>
 <script type="text/javascript">
-  function getAsyncPageInfo(url){
-    const xhr = new XMLHttpRequest()
-    console.log(">>>>>>>>>loading")
-    xhr.addEventListener('progress', function(e){
-      if (e.lengthComputable) {
-        console.log('>>>>>>>>>process:',e.loaded / e.total)
-      } else {
-        console.log('>>>>>>>>>process:无法计算进展');
-      }
-    })
-    xhr.onreadystatechange = function(){
-      console.log('>>>>>>>>>finished',xhr.readyState,xhr.status);
-      if (xhr.readyState==4 && xhr.status==200){
-        try{
-          const json = JSON.parse(xhr.responseText)
-          console.log(json)
-          App.setAsyncPage(json)
-        }catch(e){
-          console.log(e)
-        }
-      }
-    }
-    xhr.open("GET",url,true);
-    xhr.send();
-  }
-  
-
   export default {
     props: {
       to:{
@@ -47,18 +20,18 @@
         type:Boolean,
         default:false
       }, 
-      handleComplete:{
+      begin:{
         type:Function,
         default:null
       },
-      handleProcess:{
+      process:{
         type:Function,
         default:null
       },
-      handleAbort:{
+      finish:{
         type:Function,
         default:null
-      },
+      }
     },
     data(){
       return {
@@ -66,16 +39,46 @@
     },
     methods:{
       onClick(){
-        console.log(">>>>>>>>>>>>>>>>>click",this.to,this.async)
         if(!this.to){
           return
         }
         if(this.async){
-          getAsyncPageInfo(this.to+"?_page_json")
+          this.getAsyncPage()
         }else{
           location.href=this.to
         }
-        return false
+      },
+      getAsyncPage(){
+        if(window._koavc_asyncXhr){
+          window._koavc_asyncXhr.abort()
+        }
+        const xhr = new XMLHttpRequest()
+        this.$emit('begin')
+        xhr.addEventListener('progress', (processEvent)=>{
+          if(processEvent.lengthComputable){
+            this.$emit('process',processEvent.loaded/processEvent.total)
+          }
+        })
+        xhr.onreadystatechange = ()=>{
+          // console.debug('>>>>>>>>>finished',xhr.readyState,xhr.status);
+          if (xhr.readyState==4){
+            try{
+              if(xhr.status==200){
+                const json = JSON.parse(xhr.responseText)
+                console.log(json)
+                App.setAsyncPage(json)
+                this.$emit('finish')
+              }else{
+                throw new Error('request to server failed')
+              }
+            }catch(e){
+              this.$emit('finish',e)
+            }
+          }
+        }
+        xhr.open("GET",this.to+"?_page_json",true);
+        xhr.send();
+        window._koavc_asyncXhr = xhr
       }
     }
   }
