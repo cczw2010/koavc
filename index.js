@@ -6,7 +6,7 @@ import consola from "consola"
 import chalk from "chalk"
 import initApp from "./core/app.js"
 import defConfig from "./koavc.config.js"
-
+import {setVueComponentDirs} from "vuesfc"
 process.on("uncaughtException",(e)=>{
   consola.error(e)
 })

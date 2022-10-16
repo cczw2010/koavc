@@ -2,20 +2,20 @@
 "use strict"
 import consola from "consola"
 import chalk from "chalk"
-import {compiler,getRuntimeConfig as getVueSfcConfig} from "vuesfc"
+import {compiler,getRuntimeConfig as getVueSfcConfig,setVueComponentDirs} from "vuesfc"
 import runServer from "./run.js"
 import { getConfig } from "../index.js"
 // import build from "../scripts/build.js"
-const extComponentsDir = new URL("../components",import.meta.url).pathname
-consola.log("extComponentsDir：",extComponentsDir)
-
 const Config = await getConfig()
+// 自动加载本库的组件库目录
+const componentsDir = new URL("../components",import.meta.url).pathname
+setVueComponentDirs(componentsDir)
 switch (process.argv[2]) {
   case "build":
     process.env.KOAVC_ENV = "production"
     if(Config.view.engine=="vue"){
       consola.log(sysColor('vue builder start...'))
-      compiler(null,false,[extComponentsDir])
+      compiler(null,false)
     }else{
       consola.warn('View complier engine is not [vue], ignore vue complier! ')
     } 
@@ -43,7 +43,7 @@ switch (process.argv[2]) {
       compiler(()=>{
         consola.log(sysColor('Initilize server...'))
         runServer(Config,true)
-      },true,[extComponentsDir])
+      },true)
     }else{
       consola.log(sysColor('Initilize server...'))
       runServer(Config,true)
