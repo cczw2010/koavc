@@ -34,6 +34,6 @@ view渲染模块,为koa上下文context提供模板加载功能
 
 ### vue
 
-  基于vue2的ssr单文件（SFC）渲染引擎，支持布局文件和页面文件以及组件,模板文件使用单文件模式，[参考](https://www.w3cschool.cn/vuessr/) 已封装成库  参考 `vuesfcbuilder`库
+  基于vue2的ssr单文件（SFC）渲染引擎，支持布局文件和页面文件以及组件,模板文件使用单文件模式，[参考](https://www.w3cschool.cn/vuessr/) 已封装成库, [vsfc](https://github.com/cczw2010/vuesfc)库
 
   

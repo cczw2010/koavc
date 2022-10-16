@@ -184,7 +184,7 @@ alias: {
 
 ### statics
  
-静态路由目录，可配置多个 ,如果view引擎为vue，且项目的`vuesfc.config.js`中配置了`injectPath`路径，将自动将vue编译的资源文件挂载到该路径上
+静态路由目录，可配置多个 ,如果view引擎为vue，且项目的`vsfc.config.js`中配置了`injectPath`路径，将自动将vue编译的资源文件挂载到该路径上
 
 ```
 statics:[
@@ -218,7 +218,7 @@ await ctx.view(viewpath,data)
   
   ```
 
-  * **`vue`**  基于vue2的ssr单文件（SFC）渲染引擎，借鉴了`nuxt`封装了[vuesfc](https://github.com/cczw2010/vuesfc)库来使用服务器端渲染，支持布局文件和页面文件以及组件. 详细说明和配置可查看`vuesfc`项目说明。可在项目目录下建立`vuesfc.config.js`来个性化配置。  
+  * **`vue`**  基于vue2的ssr单文件（SFC）渲染引擎，借鉴了`nuxt`封装了[vsfc](https://github.com/cczw2010/vsfc)库来使用服务器端渲染，支持布局文件和页面文件以及组件. 详细说明和配置可查看`vsfc`项目说明。可在项目目录下建立`vsfc.config.js`来个性化配置。  
 
 
 3、 **配置**
@@ -230,13 +230,6 @@ view:{
   src:'view',
   <!-- 渲染引擎 default | lodash | vue ，可自行拓展  -->
   engine:'vue',
-  // 引擎对应的配置，如果有的话
-  engineOption:{
-    // for vue, 代表异步请求的url的query中的参数
-    asyncPageKey:'_asyncpage',
-    componentLoad:'_asyncpage',
-    componentError:'_asyncpage',
-  }
   // 页面静态化缓存，传入false关闭,true使用默认参数, (version:1.3.1)
   cache:{
     dir:'.koavc/pagecache',  //默认

@@ -2,7 +2,7 @@
 "use strict"
 import consola from "consola"
 import chalk from "chalk"
-import {compiler,getRuntimeConfig as getVueSfcConfig,setVueComponentDirs} from "vuesfc"
+import {compiler,getRuntimeConfig as getVueSfcConfig,setVueComponentDirs} from "vsfc"
 import runServer from "./run.js"
 import { getConfig } from "../index.js"
 // import build from "../scripts/build.js"

@@ -1,7 +1,7 @@
 import Koa from "koa"
 import staticServe from "koa-static"
 import mount from "koa-mount"
-import { rootDist } from "vuesfc"
+import { rootDist } from "vsfc"
 import {createLogger} from '../libs/logger.js'
 import loadControllers from './controller.js'
 import viewer from './view/index.js'

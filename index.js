@@ -6,7 +6,7 @@ import consola from "consola"
 import chalk from "chalk"
 import initApp from "./core/app.js"
 import defConfig from "./koavc.config.js"
-import {setVueComponentDirs} from "vuesfc"
+import {setVueComponentDirs} from "vsfc"
 process.on("uncaughtException",(e)=>{
   consola.error(e)
 })
@@ -51,8 +51,8 @@ export async function getConfig(){
     const localConfig = await import(resolve("./koavc.config.js")).then(m=>m.default)
     const config = deepmerge(defConfig,localConfig)
     config.app = initAppOptions(config.app)
-    // vuesfcconfig中 injectPath如果设置了，就自动挂载生成vue编译资源文件静态服务
-    config.vueInjectPath =  await import(resolve("./vuesfc.config.js")).then(m=>m.default.injectUrl).catch(e=>{
+    // vsfc.config.js中 injectPath如果设置了，就自动挂载生成vue编译资源文件静态服务
+    config.vueInjectPath =  await import(resolve("./vsfc.config.js")).then(m=>m.default.injectUrl).catch(e=>{
       return false
     })
     return config
