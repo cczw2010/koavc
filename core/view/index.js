@@ -70,7 +70,7 @@ export default async (options)=>{
         }
       }
        // 4 存缓存
-      if(viewCache){
+      if(viewCache && !isJson){
         viewCache.set(ctx.href,result)
       }
       ctx.body = result

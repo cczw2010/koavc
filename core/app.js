@@ -41,7 +41,7 @@ export default async function(config){
   // 初始化view
   app.context.view = await viewer(config.view)
   // 全局路由守护，不在app的router中单独设置是因为，app中可能设置了各种自定义分middlerware,会冲突，比如auth
-  app.use(routeGuard(config.app))
+  app.use(routeGuard(config.app,logger))
   // 初始化多应用
   const router = await loadControllers(config.app,logger)
   app.use(router.routes())

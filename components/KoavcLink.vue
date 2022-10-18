@@ -1,10 +1,5 @@
-<style  scoped>
-  .button{
-    color:green
-  }
-</style>
 <template>
-  <span @click="onClick">
+  <span @click="onClick" class="koavc-link">
     <slot></slot>
   </span>
 </template>
@@ -50,6 +45,7 @@
       },
       getAsyncPage(){
         if(window._koavc_asyncXhr){
+          window._koavc_asyncXhr.onreadystatechange = null //防止触发
           window._koavc_asyncXhr.abort()
         }
         const xhr = new XMLHttpRequest()
@@ -65,7 +61,6 @@
             try{
               if(xhr.status==200){
                 const json = JSON.parse(xhr.responseText)
-                console.log(json)
                 App.setAsyncPage(json)
                 this.$emit('finish')
               }else{

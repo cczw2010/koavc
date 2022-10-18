@@ -102,6 +102,65 @@ export default {
 }
 ```
 
+### view
+服务端渲染视图模板根目录，支持多种渲染模式，可在配置文件`koavc.config.js`中的`view`对象来设置。  
+
+1、**在路由文件使用 `ctx.view` 方法来渲染模板文件**
+
+```javascript
+/**
+ *	渲染模板 promise
+ * `viewpath` : 模板文件的相对于`view`根目录的相对路径
+ *					（eg： home.html ,   web/home.vue）
+ * `data`     : 注入模板中的数据对象
+ * /
+await ctx.view(viewpath,data)
+
+```
+
+2、**模板引擎支持**
+
+  * **`default`** 无引擎，
+  * **`lodash`**  基于lodash.Template的极简模板引擎
+
+  ```javascript
+  <% [js code] %> ,<%=[js variables]%>
+  
+  ```
+
+  * **`vue`**  基于vue2的ssr单文件（SFC）渲染引擎，借鉴了`nuxt`封装了[vsfc](https://github.com/cczw2010/vsfc)库来使用服务器端渲染，支持布局文件和页面文件以及组件. 详细说明和配置可查看`vsfc`项目说明。可在项目目录下建立`vsfc.config.js`来个性化配置。  
+  
+  > vue 模式下内置了`KoavcLink`组件用于做链接跳转，支持动态加载page功能,  注意只处理page,不处理layout及meta，所以如果使用请注意场景及架构
+  
+  ```
+<koavc-link to="..." async ></koavc-link>
+#属性
+to  		url地址
+async 		是否异步客户端渲染，默认false,直接跳转链接
+#事件
+begin		请求开始回调
+process		进度回调，如果支持传参进度比，没有会返回一次undifined
+finish		强求结束，如果失败或者错误则传参error
+  ```
+
+3、 **配置**
+
+```javascript
+<!-- 相关engine初始化时传入 -->
+view:{
+  <!-- 模板文件的默认根目录地址-->
+  src:'view',
+  <!-- 渲染引擎 default | lodash | vue ，可自行拓展  -->
+  engine:'vue',
+  // 页面静态化缓存，传入false关闭,true使用默认参数, (version:1.3.1)
+  cache:{
+    dir:'.koavc/pagecache',  //默认
+    ttl:1000*60*60*12        //默认
+  }
+
+},
+    
+```
 
 ### 中间件
 
@@ -148,9 +207,7 @@ return (ctx,next)=>{
 }
 ...
 
-
 ```
-
 
 #### > 中间件配置
 
@@ -194,56 +251,7 @@ statics:[
 ]
 ```
 
-### view
-服务端渲染视图模板根目录，支持多种渲染模式，可在配置文件`koavc.config.js`中的`view`对象来设置。  
-
-1、**在路由文件使用 `ctx.view` 方法来渲染模板文件**
-
-```javascript
-/**
- *	渲染模板 promise
- * `viewpath` : 模板文件的相对于`view`根目录的相对路径
- *					（eg： home.html ,   web/home.vue）
- * `data`     : 注入模板中的数据对象
- * /
-await ctx.view(viewpath,data)
-
-```
-
-2、**模板引擎支持**
-
-  * **`default`** 无引擎，
-  * **`lodash`**  基于lodash.Template的极简模板引擎
-
-  ```javascript
-  <% [js code] %> ,<%=[js variables]%>
-  
-  ```
-
-  * **`vue`**  基于vue2的ssr单文件（SFC）渲染引擎，借鉴了`nuxt`封装了[vsfc](https://github.com/cczw2010/vsfc)库来使用服务器端渲染，支持布局文件和页面文件以及组件. 详细说明和配置可查看`vsfc`项目说明。可在项目目录下建立`vsfc.config.js`来个性化配置。  
-
-
-3、 **配置**
-
-```javascript
-<!-- 相关engine初始化时传入 -->
-view:{
-  <!-- 模板文件的默认根目录地址-->
-  src:'view',
-  <!-- 渲染引擎 default | lodash | vue ，可自行拓展  -->
-  engine:'vue',
-  // 页面静态化缓存，传入false关闭,true使用默认参数, (version:1.3.1)
-  cache:{
-    dir:'.koavc/pagecache',  //默认
-    ttl:1000*60*60*12        //默认
-  }
-
-},
-    
-```
-
-
-### 开发模式
+### 开发模式&reload
 
 开发模式下`npx koavc dev`，包含服务端热重载和客户端热重载（is livereload,not hmr）.
 

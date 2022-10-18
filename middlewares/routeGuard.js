@@ -5,7 +5,7 @@
  * @param {*} appOptions  app组的配置
  * @returns
  */
-export default function(appOptions){
+export default function(appOptions,logger){
   return async (ctx,next)=>{
     let code =200
     try{
