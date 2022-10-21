@@ -5,7 +5,6 @@ import json from '@rollup/plugin-json'  // 转换json为 es6
 import progress from 'rollup-plugin-progress'
 
 const input = new URL("./start.js",import.meta.url).pathname
-const output = new URL("./start.js",import.meta.url).pathname
 const optionInput = {
   input,
   plugins:[

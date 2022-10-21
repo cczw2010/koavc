@@ -51,7 +51,7 @@ function runWorkProcess(){
 // 监控器 用于开发模式，文件变化会重启server进程
 async function watcher(config){
   // 启动简单的配置文件监控文件变化，然后服务restart
-  let watchPaths = ['./koavc.config.js','./vsfc.config.js'].concat(config.watchs)
+  let watchPaths = ['./koavc.config.js'].concat(config.watchs)
   // global middlewares
   config.middlewares.map((v)=>{
     let filepath = getLocalMiddlewarePath(v)
@@ -71,7 +71,7 @@ async function watcher(config){
     cwd:process.env.PWD,
     ignored: /(^|[\/\\])\../, // ignore dotfiles
     persistent: true,
-    interval: 1000,
+    interval: 1200,
   })
   watcher.on('ready', async() => {
     // console.log(watchPaths)
