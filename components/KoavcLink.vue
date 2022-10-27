@@ -54,6 +54,7 @@
         }
         if(requestUrl in koavc_asyncpages){
           App.setAsyncPage(koavc_asyncpages[requestUrl])
+          history.pushState(null,null,requestUrl)
           return
         }
         if(window._koavc_asyncXhr){
@@ -76,6 +77,7 @@
                 koavc_asyncpages[requestUrl] = json
                 App.setAsyncPage(json)
                 this.$emit('finish')
+                history.pushState(null,null,requestUrl)
               }else{
                 throw new Error('request to server failed')
               }
