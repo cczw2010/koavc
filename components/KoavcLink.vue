@@ -45,18 +45,6 @@
       },
       getAsyncPage(){
         const requestUrl = this.to
-        // 请求过的异步列表记录，不会在重复请求，参数不同会重新请求
-        window.koavc_asyncpages = window.koavc_asyncpages||{
-          [location.pathname+location.search]:{
-            id:App.getInstance().pageName,
-            state:{}
-          }
-        }
-        if(requestUrl in koavc_asyncpages){
-          App.setAsyncPage(koavc_asyncpages[requestUrl])
-          history.pushState(null,null,requestUrl)
-          return
-        }
         if(window._koavc_asyncXhr){
           window._koavc_asyncXhr.onreadystatechange = null //防止触发
           window._koavc_asyncXhr.abort()
@@ -74,7 +62,6 @@
             try{
               if(xhr.status==200){
                 const json = JSON.parse(xhr.responseText)
-                koavc_asyncpages[requestUrl] = json
                 App.setAsyncPage(json)
                 this.$emit('finish')
                 history.pushState(null,null,requestUrl)
