@@ -35,10 +35,7 @@ export function  initViewWatcher(watchpath,option,onChange){
     // cwd:'.',
     // alwaysStat: true,
     interval: 1000,   //过早触发可能会文件未写完
-    // awaitWriteFinish: {
-    //   stabilityThreshold: 200,
-    //   pollInterval: 100
-    // },
+    awaitWriteFinish: true
   },option)
   watcher = chokidar.watch([].concat(watchpath),option)
   watcher.on('ready', () => {

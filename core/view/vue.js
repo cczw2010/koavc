@@ -64,6 +64,7 @@ export default {
       // console.debug(">>>>>>>>>>>>>>>>",diffs,diffpages)
       return diffpages
     }catch(e){
+      // console.error(e)
       throw new Error('version manifest file get error')
     }
   },
