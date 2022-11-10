@@ -1,6 +1,6 @@
 {
   "name": "koavc",
-  "version": "2.3.3",
+  "version": "2.3.4",
   "description": "A mvc framework based koa, support multi view rendering engine ,like  vue ssr, lodash",
   "main": "index.js",
   "type": "module",
@@ -26,7 +26,7 @@
     "koa-router": "^12.0.0",
     "koa-static": "^5.0.0",
     "lodash.template": "^4.5.0",
-    "vsfc": "^link:../vuesfc",
+    "vsfc": "^1.1.9",
     "write": "^2.0.0",
     "ws": "^8.8.1"
   }
