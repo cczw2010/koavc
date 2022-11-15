@@ -2,7 +2,7 @@ import spawn from "cross-spawn"
 import chokidar  from "chokidar"
 import { resolve } from "path"
 import consola from "consola"
-import { fileURLToPath } from "url"
+import { fileURLToPath, pathToFileURL } from "url"
 
 let workProcess = null
 let scriptPath = null
@@ -11,18 +11,11 @@ process.on("SIGINT", function(code){
   process.exit(1);
 })
 // 主进程退出，子进程也退出
-process.on("beforeExit", function(code,signal){
-  if(workProcess){
-    // process.kill(workProcess.pid);
-    // workProcess.exit(0)
-    workProcess.kill(0)
-  }
-})
 process.on("exit", function(code,signal){
-  consola.log("server exit.",code)
-  // if(workProcess){
-  //   workProcess.kill()
-  // }
+  // consola.info("Server exit.")
+  if(workProcess){
+    workProcess.kill()
+  }
 })
 
 // 启动服务. 开发模式下会启动新的进程启动,便于管理重启进程
@@ -46,31 +39,29 @@ export default function(config,isDev){
 // 启动server 进程
 function runWorkProcess(){
   if(workProcess){
-    workProcess.kill(0)
+    workProcess.kill()
   }
   workProcess = spawn(
     'node',
     [scriptPath],
     {
       cwd: process.cwd(),
-      detached:true,
-      shell:(process.platform=="win32"),
+      detached:false,
+      // shell:(process.platform=="win32"),
       env: process.env,
       stdio: "inherit"
     }
   )
-  // workProcess.on("spawn",(e)=>{
-  //   consola.log("server child process spawn ",e)
-  // })
+  // consola.info(">>>>>>>>>>",workProcess.pid,workProcess.stdin,workProcess.stdio)
   workProcess.on("error",(e)=>{
-    consola.log("server child process error",e)
+    consola.error("Server error",e)
   })
   workProcess.on("exit",(code,signal)=>{
-    consola.log("server child process exit",code)
     // code非0 代表子进程非正常退出，主进程一起退出 
     if(code>0){
       process.exit(1)
     }
+    consola.info("Server restarting...")
   })
   // consola.log("workProcess running.... ",workProcess.pid)
 }
@@ -129,7 +120,7 @@ function getLocalMiddlewarePath(middleware){
 // 检查文件正确性 然后再加载
 async function runWorkProcessWithCheck(filepath){
   // 增加参数，避免import模块缓存
-  await import(`${resolve(filepath)}?${Date.now()}`).then(m=>{
+  await import(pathToFileURL(filepath).href+`?${Date.now()}`).then(m=>{
     runWorkProcess()
   }).catch(e=>{
     consola.error(filepath,e)

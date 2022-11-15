@@ -8,6 +8,7 @@ import runServer from "./run.js"
 import { getConfig } from "../index.js"
 // import build from "../scripts/build.js"
 const Config = await getConfig()
+consola.level = process.env.CONSOLA_LEVEL = Config.logger.level
 // 自动加载本库的组件库目录
 const componentsDir = fileURLToPath(new URL("../components",import.meta.url))
 setVueComponentDirs(componentsDir)
