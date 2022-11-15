@@ -2,13 +2,14 @@
 "use strict"
 import consola from "consola"
 import chalk from "chalk"
+import {fileURLToPath} from "url"
 import {compiler,getRuntimeConfig as getVueSfcConfig,setVueComponentDirs} from "vsfc"
 import runServer from "./run.js"
 import { getConfig } from "../index.js"
 // import build from "../scripts/build.js"
 const Config = await getConfig()
 // 自动加载本库的组件库目录
-const componentsDir = new URL("../components",import.meta.url).pathname
+const componentsDir = fileURLToPath(new URL("../components",import.meta.url))
 setVueComponentDirs(componentsDir)
 switch (process.argv[2]) {
   case "build":

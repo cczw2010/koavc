@@ -1,11 +1,12 @@
 /**
  * 路由， 遍历加载路由文件
  */
-import {relative,join} from "path"
+import {relative,join,sep} from "path"
 import { readdir,stat } from 'fs/promises'
 import Router from 'koa-router'
 import {middlewaresLoader} from "./middleware.js"
 import {setRouteExtParams} from "../middlewares/injectController.js"
+import { pathToFileURL } from "url"
 // controller固定的属性
 const constants = ['name','alias','middlewares','fn','method']
 const defAppMiddlewares = ['../middlewares/injectController.js']
@@ -59,15 +60,13 @@ async function travel(dir,router,appBaseDir) {
   // files.reverse()
   for (const k in files) {
     const file = files[k];
-    const pathname = join(dir, file)
-    const relativePathname = relative(process.env.PWD,pathname)
-    const stats = await stat(pathname)
-    
+    const subdir = join(dir, file)
+    const relativePathname = relative(process.cwd(),subdir)
+    const stats = await stat(subdir)
     if (stats.isDirectory()) {
-      await travel(pathname,router,appBaseDir);
-    } else if(pathname.endsWith('.js')){
-
-      let m = await import(pathname).then(module=>module.default).catch(e=>e)
+      await travel(subdir,router,appBaseDir);
+    } else if(subdir.endsWith('.js')){
+      let m = await import(pathToFileURL(subdir)).then(module=>module.default).catch(e=>e)
       if(!m ){
         Logger.warn(`ignored [${relativePathname}], returned default is empty.`)
         continue
@@ -76,7 +75,6 @@ async function travel(dir,router,appBaseDir) {
         Logger.error(`ignored [${relativePathname}]`,m)
         continue
       }
-
       const params = []
       //1 route name
       if(m.name){
@@ -86,13 +84,12 @@ async function travel(dir,router,appBaseDir) {
       const paths = []
       // 2.1index.js  简写支持
       if(file.toLowerCase()=='index.js'){
-        const route = join('/',relative(appBaseDir,dir))
-        // console.log(">>>>>>>>>>>",route)
-        paths.push(route)
+        const route = join('/',relative(appBaseDir,dir,subdir))
+        paths.push(transPathtoLinux(route))
       }
       // 2.2
-      const route = relative(appBaseDir,pathname).replace(/\.js$/i,'').replace(/\/_/g,'\/:')
-      paths.push(join('/',route))
+      const route = relative(appBaseDir,subdir).replace(/\.js$/i,'').replace(/\/_/g,'\/:')
+      paths.push(transPathtoLinux(join('/',route)))
       // 2.3 alias
       if(m.alias){
         paths.push(m.alias)
@@ -132,6 +129,7 @@ async function travel(dir,router,appBaseDir) {
   }
 }
 
-
-
-
+// 转换window路径为linux路径
+function transPathtoLinux(relativePath){
+  return relativePath.split(sep).join('/')
+}

@@ -2,6 +2,7 @@ import spawn from "cross-spawn"
 import chokidar  from "chokidar"
 import { resolve } from "path"
 import consola from "consola"
+import { fileURLToPath } from "url"
 
 let workProcess = null
 let scriptPath = null
@@ -10,16 +11,33 @@ process.on("SIGINT", function(code){
   process.exit(1);
 })
 // 主进程退出，子进程也退出
-process.on("exit", function(code){
+process.on("beforeExit", function(code,signal){
   if(workProcess){
-    workProcess.kill()
+    // process.kill(workProcess.pid);
+    // workProcess.exit(0)
+    workProcess.kill(0)
   }
 })
+process.on("exit", function(code,signal){
+  consola.log("server exit.",code)
+  // if(workProcess){
+  //   workProcess.kill()
+  // }
+})
 
-// 启动服务进程，如果存在会自动先干掉
+// 启动服务. 开发模式下会启动新的进程启动,便于管理重启进程
 export default function(config,isDev){
   const scriptFile = !isDev?'../scripts/start.js':'../scripts/dev.js'
-  scriptPath = new URL(scriptFile,import.meta.url).pathname
+  // 非开发模式，直接当前进程启动。 
+  if(!isDev){
+    import (new URL(scriptFile,import.meta.url))
+    return
+  }
+  // scriptPath = scriptFile
+  // scriptPath = new URL(scriptFile,import.meta.url).href
+  // scriptPath = new URL(scriptFile,import.meta.url).pathname
+  scriptPath = fileURLToPath(new URL(scriptFile,import.meta.url))
+  // scriptPath = fileURLToPath(new URL('./test.js',import.meta.url))
   runWorkProcess()
   if(isDev){
     watcher(config)
@@ -28,7 +46,7 @@ export default function(config,isDev){
 // 启动server 进程
 function runWorkProcess(){
   if(workProcess){
-    workProcess.kill()
+    workProcess.kill(0)
   }
   workProcess = spawn(
     'node',
@@ -36,17 +54,25 @@ function runWorkProcess(){
     {
       cwd: process.cwd(),
       detached:true,
+      shell:(process.platform=="win32"),
       env: process.env,
       stdio: "inherit"
     }
   )
-  workProcess.on("exit",(code)=>{
+  // workProcess.on("spawn",(e)=>{
+  //   consola.log("server child process spawn ",e)
+  // })
+  workProcess.on("error",(e)=>{
+    consola.log("server child process error",e)
+  })
+  workProcess.on("exit",(code,signal)=>{
+    consola.log("server child process exit",code)
     // code非0 代表子进程非正常退出，主进程一起退出 
     if(code>0){
       process.exit(1)
     }
   })
-  // console.log("workProcess running.... ",workProcess.pid)
+  // consola.log("workProcess running.... ",workProcess.pid)
 }
 // 监控器 用于开发模式，文件变化会重启server进程
 async function watcher(config){

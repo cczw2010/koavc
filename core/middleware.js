@@ -1,4 +1,5 @@
-import consola from "consola"
+import { resolve } from "path"
+import {pathToFileURL} from "url"
 /**
  * 加载并初始化所有配置的middleware
  * @export Promise
@@ -43,7 +44,10 @@ async function loadMiddleware(middlewareOption){
     optionPath = middlewareOption[0]
     option = middlewareOption[1]
   }
-  const middlewarePath = optionPath.replace(/^~/ig,process.env.PWD)
+  let middlewarePath= optionPath
+  if(optionPath.startsWith("~")){
+    middlewarePath = pathToFileURL(optionPath.replace(/^~/ig,process.cwd()))
+  }
   const middlewareInit = await import(middlewarePath).then(m=>m.default).catch(e=>{
     throw new Error(`[${optionPath}]:${e.toString()}`)
   })

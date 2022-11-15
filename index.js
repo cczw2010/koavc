@@ -1,11 +1,13 @@
 import http from "http"
 import https from "https"
 import {resolve} from "path"
+import { pathToFileURL } from 'url'
 import deepmerge from "deepmerge"
 import consola from "consola"
 import chalk from "chalk"
 import initApp from "./core/app.js"
 import defConfig from "./koavc.config.js"
+import {getLocalConfig} from "vsfc"
 process.on("uncaughtException",(e)=>{
   consola.error(e)
 })
@@ -47,13 +49,12 @@ export async function run(callback){
  */
 export async function getConfig(){
   try{
-    const localConfig = await import(resolve("./koavc.config.js")).then(m=>m.default)
+    const localConfig = await import(pathToFileURL(resolve("./koavc.config.js"))).then(m=>m.default)
     const config = deepmerge(defConfig,localConfig)
     config.app = initAppOptions(config.app)
     // vsfc.config.js中 injectPath如果设置了，就自动挂载生成vue编译资源文件静态服务
-    config.vueInjectPath =  await import(resolve("./vsfc.config.js")).then(m=>m.default.injectUrl).catch(e=>{
-      return false
-    })
+    const vsfcLocalConfig = await getLocalConfig()
+    config.vueInjectPath =  vsfcLocalConfig.injectUrl||false
     return config
   }catch(e){
     consola.error('Error in [koavc.config.js].',e)

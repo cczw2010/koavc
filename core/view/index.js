@@ -47,6 +47,7 @@ export default async (options)=>{
       // 使用全路径，防止不统一
       filePath =  resolve(options.src,filePath)
     }
+
     // 2 获取代码，渲染引擎提供自己设定的获取函数将覆盖默认获取源码字符串的方法
     let sourceData = null
     if('getSource' in renderEngine){

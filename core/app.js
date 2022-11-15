@@ -44,7 +44,7 @@ export default async function(config){
   app.use(routeGuard(config.app,logger))
   // 初始化多应用
   const router = await loadControllers(config.app,logger)
-  app.use(router.routes())
+  app.use(router.routes(),router.allowedMethods())
   return app
 }
 
