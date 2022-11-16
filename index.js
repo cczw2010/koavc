@@ -4,7 +4,6 @@ import {resolve} from "path"
 import { pathToFileURL } from 'url'
 import deepmerge from "deepmerge"
 import consola from "consola"
-import chalk from "chalk"
 import initApp from "./core/app.js"
 import defConfig from "./koavc.config.js"
 import {getLocalConfig} from "vsfc"
@@ -30,8 +29,8 @@ export async function run(callback){
       logger.error(err)
     } else {
       const muse = process.memoryUsage()
-      logger.info(chalk.gray(`Memory usage ${(muse.heapTotal/(1024*1024)).toFixed(2)}MB (rss:${(muse.rss/(1024*1024)).toFixed(2)}MB)`))
-      logger.success(`Server start successful. ${httpsOption?'https':'http'}://${host}:${port}`)
+      logger.info(`Memory usage ${(muse.heapTotal/(1024*1024)).toFixed(2)}MB (rss:${(muse.rss/(1024*1024)).toFixed(2)}MB)`)
+      logger.success(`Server start success. ${httpsOption?'https':'http'}://${host}:${port}`)
     } 
   }
   if(httpsOption){

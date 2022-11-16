@@ -43,6 +43,7 @@ let logger = null
  */
 export function createLogger(options){
   options = deepmerge(DEFAULTOPTIONS,options||{})
+  // process.env.CONSOLA_LEVEL = options.level
   logger = consola.create({
     level:options.level,
     reporters:[],

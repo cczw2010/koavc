@@ -12,7 +12,6 @@
     "koavc": "./bin/index.js"
   },
   "dependencies": {
-    "chalk": "^5.0.1",
     "chokidar": "^3.5.3",
     "consola": "^2.15.3",
     "cross-spawn": "^7.0.3",
@@ -25,7 +24,7 @@
     "koa-router": "^12.0.0",
     "koa-static": "^5.0.0",
     "lodash.template": "^4.5.0",
-    "vsfc": "link:../vuesfc",
+    "vsfc": "^1.2.0",
     "write": "^2.0.0",
     "ws": "^8.8.1"
   }

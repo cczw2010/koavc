@@ -48,8 +48,10 @@ app:[
     allowedMethods:{},
     // 公用路由中间件,这里的中间件可以访问router，,默认空
     middlewares:['~/middlewares/auth.js'],
-    <!-- 异常页面网址，400以上的错误会redirectTo:${errorPage}/${ctx.status}-->
+    <!-- 异常页面网址-->
     errorPage:'/error'
+    <!-- 异常页面是否传入response.code , 实际会redirectTo:${errorPage}?code=${ctx.status}-->
+    errorPageCode:false
   }
   ...
 ]
@@ -243,7 +245,7 @@ alias: {
 
 ### statics
  
-静态路由目录，可配置多个 ,如果view引擎为vue，且项目的`vsfc.config.js`中配置了`injectPath`路径，将自动将vue编译的资源文件挂载到该路径上
+静态路由目录，可配置多个 ,如果view引擎为vue，且项目的`vsfc.config.js`中配置了`injectPath`路径，将自动将vue编译的资源文件挂载到该路径上. 且增加`ctx.isStaticPath`属性来判断当前url是否静态路由
 
 ```
 statics:[

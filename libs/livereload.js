@@ -1,5 +1,6 @@
 import chokidar  from "chokidar"
 import hash from "hash-sum"
+import {join} from "path"
 import { WebSocketServer } from  'ws'
 import consola from "consola"
 let wsServer = null
@@ -60,7 +61,7 @@ export function injectCode(pagePath){
     return false
   }
   const pageUUID = getPageUUid(pagePath)
-  // consola.log('inject code',pagePath,pageUUID)
+  // consola.debug('inject code',pagePath,pageUUID)
   const address = wsServer.address()
   return `<script type="text/javascript">
   var __livereload_uuid = '${pageUUID}'
@@ -112,6 +113,7 @@ export function reloadPage(pagePath){
   const pageUUID = getPageUUid(pagePath)
   consola.debug("reloadPage：",pagePath,pageUUID)
   wsServer.clients.forEach(function(client) {
+    // consola.debug("client reload =====:：",client.pageUUID)
     if (client.readyState === 1 && client.pageUUID==pageUUID) { //WebSocket.OPEN
       // consola.debug("client reload：",pagePath,client.pageUUID)
       client.send(CLIENTMSGTYPE.reload);
@@ -121,6 +123,7 @@ export function reloadPage(pagePath){
 
 
 function getPageUUid(pagePath){
-  return hash(pagePath)
+  // join一下，这样可以转换成统一的本地系统的文件路径格式
+  return hash(join(pagePath))
 }
 
